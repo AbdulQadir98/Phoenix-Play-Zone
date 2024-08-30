@@ -1,0 +1,236 @@
+const db = require("./firebase");
+
+const getBookings = async (page, pageSize) => {
+  try {
+    const offset = (page - 1) * pageSize;
+    const snapshot = await db
+      .collection("bookingDetails")
+      .orderBy("startTime", "desc")
+      .offset(offset)
+      .limit(pageSize)
+      .get();
+      return snapshot.docs.map((doc) => ({
+        bookingId: doc.id, // Include the document ID
+        ...doc.data(), // Spread the document data
+      }));
+  } catch (error) {
+    console.error("Error fetching users:", error.message);
+    throw error;
+  }
+};
+
+const getBookingsCount = async () => {
+  try {
+    const snapshot = await db.collection("bookingDetails").get();
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error fetching bookings count:", error.message);
+    throw error;
+  }
+};
+
+const getBookingsByStatus = async (status, page, pageSize) => {
+  try {
+    const offset = (page - 1) * pageSize;
+    const snapshot = await db
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .orderBy("startTime", "desc")
+      .offset(offset)
+      .limit(pageSize)
+      .get();
+
+      return snapshot.docs.map((doc) => ({
+        bookingId: doc.id,
+        ...doc.data(),
+      }));
+  } catch (error) {
+    console.error("Error fetching bookings by status:", error.message);
+    throw error;
+  }
+};
+
+const getBookingsByStatusCount = async (status) => {
+  try {
+    const snapshot = await db
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .get();
+
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error fetching bookings by status count:", error.message);
+    throw error;
+  }
+};
+
+const getBookingById = async (id) => {
+  try {
+    const bookingDoc = await db.collection("bookingDetails").doc(id).get();
+
+    if (bookingDoc.exists) {
+      return bookingDoc.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching booking:", error.message);
+    throw error;
+  }
+};
+
+const addBookingDetails = async (bookingDetails) => {
+  try {
+    const docRef = await db.collection("bookingDetails").add(bookingDetails);
+    return {
+      success: true,
+      message: "Booking details stored successfully.",
+      id: docRef.id,
+    };
+  } catch (error) {
+    console.error("Error writing booking details: ", error.message);
+    throw error;
+  }
+};
+
+const deleteBookingById = async (id) => {
+  try {
+    const bookingRef = db.collection("bookingDetails").doc(id);
+    const doc = await bookingRef.get();
+
+    if (doc.exists) {
+      await bookingRef.delete(); // Delete the document
+      return { success: true };
+    } else {
+      return { success: false }; // Document not found
+    }
+  } catch (error) {
+    console.error("Error deleting booking:", error.message);
+    throw error;
+  }
+};
+
+const updateBookingStatus = async (id, { status, endTime }) => {
+  try {
+    const bookingRef = db.collection("bookingDetails").doc(id);
+    const doc = await bookingRef.get();
+
+    if (doc.exists) {
+      const updateData = { status };
+      if (endTime) {
+        updateData.endTime = endTime;
+      }
+      await bookingRef.update(updateData);
+      return { success: true };
+    } else {
+      return { success: false }; // Document not found
+    }
+  } catch (error) {
+    console.error("Error updating booking status:", error.message);
+    throw error;
+  }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+let courts = [];
+const initCourts = () => {
+  courts = Array(3)
+    .fill(null)
+    .map((_, i) => ({
+      courtNumber: i + 1,
+      isAllocated: false,
+      startTime: null,
+      duration: null,
+    }));
+  console.log(courts);
+};
+
+// for Debug Purpose
+function DiplayCourts() {
+  console.log(courts);
+}
+
+const getCourt = async (courtNumber) => {
+  try {
+    const number = Number(courtNumber);
+    if (isNaN(number)) {
+      throw new Error("Invalid court number");
+    }
+    const court = courts.find((court) => court.courtNumber === number);
+    if (!court) {
+      throw new Error(`Court number ${courtNumber} not found`);
+    }
+    return court;
+  } catch (error) {
+    console.error("Error in getCourt Method", error.message);
+    return null;
+  }
+};
+
+function setCourt(courtNumber, court) {
+  const index = courts.findIndex((c) => c.courtNumber === courtNumber);
+  if (index !== -1) {
+    courts[index] = court;
+  }
+}
+
+function isCourtAvailable(courtNumber) {
+  const court = courts.find((c) => c.courtNumber === courtNumber);
+  if (!court) return false;
+
+  if (!court.isAllocated) return true;
+
+  // TF is this?
+  const now = new Date();
+  const endTime = new Date(court.startTime);
+  endTime.setMinutes(endTime.getMinutes() + court.duration);
+
+  return now >= endTime;
+}
+
+// Function to get remaining time for all courts
+const getRemainingTimes = async () => {
+  if (!courts) {
+    console.error("courts are unable to fetch");
+  }
+  try {
+    const results = courts.map((court) => {
+      if (!court.isAllocated) {
+        return {
+          courtNumber: court.courtNumber,
+          message: "Court not allocated",
+        };
+      }
+
+      const elapsedTime = new Date() - new Date(court.startTime); // Ensure startTime is a Date object
+      const remainingTime = Math.max(
+        0,
+        (court.duration * 60 * 1000 - elapsedTime) / 1000 / 60
+      ); // Convert remaining time to minutes
+
+      return { courtNumber: court.courtNumber, remainingTime };
+    });
+    // console.log('Remaining Times', results)
+    return results;
+  } catch (error) {
+    console.error("Error in getRemainingTimes Method", error.message);
+  }
+};
+
+module.exports = {
+  getBookings,
+  getBookingsCount,
+  getBookingsByStatus,
+  getBookingsByStatusCount,
+  getBookingById,
+  addBookingDetails,
+  deleteBookingById,
+  updateBookingStatus,
+  initCourts,
+  getCourt,
+  setCourt,
+  isCourtAvailable,
+  getRemainingTimes,
+  DiplayCourts,
+};

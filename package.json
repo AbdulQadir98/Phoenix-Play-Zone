@@ -1,0 +1,29 @@
+{
+  "name": "phoenix-play-zone",
+  "description": "The Pearl Indoor Sports Club",
+  "author": "Meesal.ai",
+  "version": "0.1.0",
+  "main": "main/electron.js",
+  "scripts": {
+    "electron": "electron .",
+    "package": "electron-builder",
+    "dist": "electron-builder build"
+  },
+  "devDependencies": {
+    "app-builder-bin": "^4.2.0",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.yourapp.id",
+    "productName": "Phoenix",
+    "files": [
+      "main/",
+      "admin-frontend/build/",
+      "admin-backend/dist/admin-backend.exe"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
