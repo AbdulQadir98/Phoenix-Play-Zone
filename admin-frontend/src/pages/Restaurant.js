@@ -8,9 +8,10 @@ const Restaurant = () => {
       <Card className="w-full max-w-lg shadow-lg">
         <CardContent className="text-center">
           <AccessTimeIcon className="text-9xl text-gray-500 mb-4" />
-          <Typography variant="h4" component="h2" className="font-bold text-gray-800 mb-2">
+          <Typography variant="h4" component="h2" className="font-bold text-gray-600 mb-2">
             Restaurant Coming Soon
           </Typography>
+          <br/>
           <Typography variant="body1" component="p" className="text-gray-600">
             We're working to bring you an amazing dining experience. Stay tuned for updates!
           </Typography>
