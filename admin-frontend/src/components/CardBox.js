@@ -23,6 +23,7 @@ import {
   deleteBooking,
   updateBookingStatus,
 } from "../services/booking";
+import { sendDuration } from "../services/timer";
 import { useSelector, useDispatch } from "react-redux";
 import {
   startTimer,
@@ -77,7 +78,9 @@ const CardBox = ({ cid, title, name }) => {
       timer = setTimeout(() => {
         const newRemainingTime = calculateRemainingTime();
         if (newRemainingTime !== remainingTime) {
-          dispatch(updateRemainingTime({ cid, remainingTime: newRemainingTime }));
+          dispatch(
+            updateRemainingTime({ cid, remainingTime: newRemainingTime })
+          );
         }
       }, 1000);
     } else if (remainingTime === 0) {
@@ -156,7 +159,7 @@ const CardBox = ({ cid, title, name }) => {
         console.log(response.data.message + ": " + response.data.bookingId);
       })
       .catch((error) => {
-        console.error("Error sending Booking details", error);
+        console.error("Error sending Booking details", error.message);
         setErrorMessage("Failed to start booking. Please try again.");
         setOpenSnackbar(true); // Show Snackbar with error message
       })
@@ -174,6 +177,17 @@ const CardBox = ({ cid, title, name }) => {
             return prevIsResetClicked;
           });
         }, 10000); // 10 seconds
+      });
+
+    //send time duration to the TV
+    sendDuration(duration, cid)
+      .then((data) => {
+        console.log("Duration sent successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error sending duration:", error.message);
+        setErrorMessage("Failed to send Time.");
+        setOpenSnackbar(true); // Show Snackbar with error message
       });
   };
 
@@ -212,6 +226,17 @@ const CardBox = ({ cid, title, name }) => {
     } finally {
       dispatch(endTimer({ cid })); // Disable "End Time" button
       setEndConfirmOpen(false);
+
+      //reset time on TV
+      sendDuration(0, cid)
+        .then((data) => {
+          console.log("Duration sent successfully:", data);
+        })
+        .catch((error) => {
+          console.error("Error sending duration:", error.message);
+          setErrorMessage("Failed to send Time.");
+          setOpenSnackbar(true); // Show Snackbar with error message
+        });
     }
   };
 
@@ -234,6 +259,17 @@ const CardBox = ({ cid, title, name }) => {
     setIsResetClicked(true);
     setConfirmOpen(false);
     dispatch(resetTimer({ cid })); // Disable "Reset" button
+
+    //reset time on TV
+    sendDuration(0, cid)
+    .then((data) => {
+      console.log("Duration sent successfully:", data);
+    })
+    .catch((error) => {
+      console.error("Error sending duration:", error.message);
+      setErrorMessage("Failed to send Time.");
+      setOpenSnackbar(true); // Show Snackbar with error message
+    });
   };
 
   const handleSnackbarClose = () => {
@@ -246,7 +282,7 @@ const CardBox = ({ cid, title, name }) => {
         sx={{ minWidth: 275 }}
         className="shadow-lg rounded-lg overflow-hidden"
       >
-        <CardContent className="bg-gray-50 text-white p-6">
+        <CardContent className="bg-gray-100 text-white p-6">
           <Typography
             variant="h5"
             component="div"
@@ -276,7 +312,7 @@ const CardBox = ({ cid, title, name }) => {
             <Typography
               className="text-center bg-white py-3"
               variant="h4"
-              sx={{ fontWeight: "bold" }}
+              sx={{ fontWeight: "bold"}}
               color="text.secondary"
             >
               OPEN
