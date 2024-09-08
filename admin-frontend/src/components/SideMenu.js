@@ -16,13 +16,21 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import SportsTennisIcon from "@mui/icons-material/SportsTennis";
+import EventIcon from "@mui/icons-material/Event";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import HistoryIcon from "@mui/icons-material/History";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SettingsIcon from "@mui/icons-material/Settings";
+import UpdateIcon from "@mui/icons-material/Update";
 
 import Courts from "../pages/Courts";
 import Book from "../pages/Book";
 import Restaurant from "../pages/Restaurant";
 import History from "../pages/History";
+import Notification from "../pages/Notification";
+import Settings from "../pages/Settings";
+import Update from "../pages/Update";
 
 const drawerWidth = 240;
 
@@ -122,7 +130,7 @@ export default function MiniDrawer() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            The Pearl Indoor
+            Phoenix Play Zone
           </Typography>
         </Toolbar>
       </AppBar>
@@ -155,7 +163,9 @@ export default function MiniDrawer() {
                     justifyContent: "center",
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {text === "Courts" && <SportsTennisIcon />}
+                  {text === "Bookings" && <EventIcon />}
+                  {text === "Restaurant" && <RestaurantIcon />}
                 </ListItemIcon>
                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
@@ -164,46 +174,45 @@ export default function MiniDrawer() {
         </List>
         <Divider />
         <List>
-          {["History", "Notifications", "Settings", "Update"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                onClick={() => setSelectedComponent(text.toLowerCase())}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+          {["History", "Notifications", "Settings", "Update"].map(
+            (text, index) => (
+              <ListItem key={text} disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  onClick={() => setSelectedComponent(text.toLowerCase())}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {text === "History" && <HistoryIcon />}
+                    {text === "Notifications" && <NotificationsIcon />}
+                    {text === "Settings" && <SettingsIcon />}
+                    {text === "Update" && <UpdateIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {selectedComponent === "courts" && <Courts />}
         {selectedComponent === "bookings" && <Book />}
-        {selectedComponent === "restaurant" && <Restaurant/>}
+        {selectedComponent === "restaurant" && <Restaurant />}
         {selectedComponent === "history" && <History />}
-        {selectedComponent === "notifications" && (
-          <Typography paragraph>NOTIFICATIONS</Typography>
-        )}
-        {selectedComponent === "settings" && (
-          <Typography paragraph>SETTINGS</Typography>
-        )}
-        {selectedComponent === "update" && (
-          <Typography paragraph>UPDATE</Typography>
-        )}
+        {selectedComponent === "notifications" && <Notification />}
+        {selectedComponent === "settings" && <Settings/>}
+        {selectedComponent === "update" && <Update/>}
       </Box>
     </Box>
   );

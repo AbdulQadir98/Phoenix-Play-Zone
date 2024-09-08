@@ -1,10 +1,15 @@
-import React from "react";
+import { useState } from "react";
 import TimerDisplay from "../components/TimerDisplay";
+import Score from "../components/Score";
 
 const Home = () => {
+
+  const [hasScore, setHasScore] = useState(false);
+
   return (
     <div>
-      <TimerDisplay />
+      <TimerDisplay hasScore={hasScore}/>
+      {hasScore && <Score />}
     </div>
   );
 };

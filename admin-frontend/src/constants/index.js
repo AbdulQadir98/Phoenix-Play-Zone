@@ -1,3 +1,5 @@
+export const DEV_API_URL = "http://localhost:4000";
+export const PROD_API_URL = "http://192.168.1.100:4000";
 export const ROWS_PER_PAGE = 5;
 export const PRICE_PER_HOUR = 600;
 export const MIN_INCREMENT = 30;

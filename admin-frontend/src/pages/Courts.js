@@ -1,11 +1,11 @@
 import CardBox from "../components/CardBox";
 
 const cardData = [
-  { cid: 1, title: "Court 1 : Futsal (ISC01)", name: "This is the first Court" },
-  { cid: 2, title: "Court 2 : Futsal (ISC02)", name: "This is the second Court" },
+  { cid: 1, title: "Court 1 : Futsal Court", name: "This is the first Court" },
+  { cid: 2, title: "Court 2 : Futsal Court", name: "This is the second Court" },
   { cid: 3, title: "Court 3 : Badminton Court", name: "This is the third Court" },
-  { cid: 4, title: "Court 4 : Leather (ISC01)", name: "This is the fourth Court" },
-  { cid: 5, title: "Court 5 : Leather (ISC02)", name: "This is the fifth Court" },
+  { cid: 4, title: "Court 4 : Leather Court", name: "This is the fourth Court" },
+  { cid: 5, title: "Court 5 : Leather Court", name: "This is the fifth Court" },
 ];
 
 const Courts = () => {
