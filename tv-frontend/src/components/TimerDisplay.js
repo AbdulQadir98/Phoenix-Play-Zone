@@ -8,7 +8,6 @@ const TimerDisplay = ({ timeString, remainingTime }) => {
     height: isMatchStarted ? "60vh" : "100vh",
     margin: 0,
     backgroundColor: "#2c3e50",
-
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -16,25 +15,23 @@ const TimerDisplay = ({ timeString, remainingTime }) => {
     transition: "background-color 0.3s ease",
   };
 
-  const digitStyle = {
+  const timerStyle = {
     width: "13rem",
     height: "22rem",
+    backgroundColor: "#34495e",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     fontSize: "20rem",
     fontWeight: "bold",
-    color: "#ecf0f1",
-    backgroundColor: "#34495e",
     borderRadius: "0.5rem",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
     transition: "background-color 0.3s ease, color 0.3s ease",
   };
 
-  const getDigitStyle = (digit, remainingTime) => ({
-    ...digitStyle,
+  const getTimerStyle = (remainingTime) => ({
+    ...timerStyle,
     color: remainingTime <= 900 ? "#e74c3c" : "#ecf0f1",
-    backgroundColor: "#34495e",
   });
 
   return (
@@ -46,7 +43,7 @@ const TimerDisplay = ({ timeString, remainingTime }) => {
               {char}
             </span>
           ) : (
-            <div key={index} style={getDigitStyle(char, remainingTime)}>
+            <div key={index} style={getTimerStyle(remainingTime)}>
               {char}
             </div>
           )

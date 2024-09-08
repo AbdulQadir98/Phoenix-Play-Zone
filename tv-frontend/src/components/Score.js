@@ -1,18 +1,6 @@
-const scoreContainerStyle = {
-  height: "40vh",
-  margin: 0,
-  backgroundColor: "#2c3e50",
-  color: "#ecf0f1",
-  fontSize: "4rem",
-
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
 const Score = () => {
   return (
-    <div style={scoreContainerStyle}>
+    <div className="h-[40vh] m-0 bg-gray-300 text-[#ecf0f1] text-4xl flex justify-center items-center">
       Score: 135/4
     </div>
   );
