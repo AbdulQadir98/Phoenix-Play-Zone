@@ -8,18 +8,17 @@ import {
 
 const ItemCard = ({ foodItems, addToCart }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
       {foodItems.map((item) => (
         <Card key={item.id} className="shadow-lg">
           <CardMedia
             component="img"
-            height="150"
             image={item.image}
             alt={item.name}
           />
           <CardContent>
             <Typography
-              variant="h5"
+              variant="h6"
               component="div"
               className="text-base md:text-lg lg:text-xl"
             >

@@ -2,18 +2,28 @@ import { useState } from "react";
 import ItemCard from "../components/ItemCard";
 import Cart from "../components/Cart";
 
-import burger from "./burger.webp";
-import pizza from "./pizza.webp";
-import salad from "./salad.webp";
-import fries from "./fries.webp";
-import lime from "./lime.jpg";
+import burger from "../assets/burger.webp";
+import pizza from "../assets/pizza.webp";
+import salad from "../assets/salad.webp";
+import fries from "../assets/fries.webp";
+import lime from "../assets/lime.jpg";
+import tacos from "../assets/tacos.webp";
+import pasta from "../assets/pasta.webp";
+import wings from "../assets/wings.webp";
+import icecream from "../assets/icecream.webp";
+import mojito from "../assets/mojito.png";
 
 const foodItems = [
-  { id: 1, name: "Burger", price: 5, image: burger, availability: true },
-  { id: 2, name: "Pizza", price: 8, image: pizza, availability: false },
-  { id: 3, name: "Salad", price: 4, image: salad, availability: true },
-  { id: 4, name: "Fries", price: 3, image: fries, availability: true },
-  { id: 5, name: "Soda", price: 2, image: lime, availability: false },
+  { id: 1, name: "Burger", price: 1200, image: burger, availability: true },
+  { id: 2, name: "Pizza", price: 1100, image: pizza, availability: false },
+  { id: 3, name: "Salad", price: 300, image: salad, availability: true },
+  { id: 4, name: "Fries", price: 200, image: fries, availability: true },
+  { id: 5, name: "Lime Juice", price: 100, image: lime, availability: false },
+  { id: 6, name: "Tacos", price: 500, image: tacos, availability: true },
+  { id: 7, name: "Pasta", price: 800, image: pasta, availability: true },
+  { id: 8, name: "Wings", price: 400, image: wings, availability: true },
+  { id: 9, name: "Ice Cream", price: 300, image: icecream, availability: true },
+  { id: 10, name: "Mojito", price: 200, image: mojito, availability: true },
 ];
 
 const Home = () => {
