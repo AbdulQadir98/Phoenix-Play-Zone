@@ -70,14 +70,39 @@ const Home = () => {
     });
   };
 
-  const placeOrder = () => {
+  const placeOrder = async (customerName) => {
+    if (!customerName.trim()) {
+      alert("Please enter your name before placing the order.");
+      return;
+    }
+
+    const orderTime = new Date().toISOString();
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
     const totalPrice = cart.reduce((acc, item) => acc + item.item.price * item.quantity, 0);
-  
-    alert(`You ordered ${totalItems} items.\nTotal price: $${totalPrice.toFixed(2)}`);
+    
+    // cart.map((cartItem) => (
+    //   console.log(cartItem.item.name)
+    // ))
+    // console.log(cart[0].item.name)
+
+    const order = {
+      customerName,
+      orderTime,
+      items: cart.map(i => ({
+        qty: i.quantity,
+        name: i.item.name
+      })),
+      totalPrice,
+      status: "PENDING",
+    };
+
+    console.log(order);
+
+    alert(
+      `Thank you, ${customerName}!\nYou ordered ${totalItems} item(s).\nTotal price: $${totalPrice.toFixed(2)}.`
+    );
     setCart([]); // Clear cart after placing order
   };
-  
 
   const totalPrice = cart.reduce(
     (acc, cartItem) => acc + cartItem.item.price * cartItem.quantity,
@@ -97,7 +122,12 @@ const Home = () => {
         </div>
 
         {/* Sticky cart */}
-        <Cart cart={cart} totalPrice={totalPrice} placeOrder={placeOrder} removeFromCart={removeFromCart}/>
+        <Cart
+          cart={cart}
+          totalPrice={totalPrice}
+          placeOrder={placeOrder}
+          removeFromCart={removeFromCart}
+        />
       </div>
     </div>
   );
