@@ -9,7 +9,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
+import Alert from "@mui/material/Alert";
+import { getAlertSeverity } from "../utils";
 
 const Orders = () => {
   const [open, setOpen] = useState(false);
@@ -35,6 +39,10 @@ const Orders = () => {
     setOpen(false);
   };
 
+  const handleCloseClick = async (orderId) => {
+    console.log("Open Confirmation Box :", orderId)
+  };
+
   return (
     <>
       <Button variant="contained" color="primary" onClick={handleOpen}>
@@ -58,10 +66,10 @@ const Orders = () => {
                 <TableRow>
                   <TableCell>Customer Name</TableCell>
                   <TableCell>Order</TableCell>
-                  <TableCell>Qty</TableCell>
-                  <TableCell>Price</TableCell>
+                  <TableCell>Amount&nbsp;(Rs.)</TableCell>
                   <TableCell>Order Date</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -69,18 +77,32 @@ const Orders = () => {
                   <TableRow key={order.orderId}>
                     <TableCell>{order.customerName}</TableCell>
                     <TableCell>
-                        <ul>
-                          {order.items.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))}
-                        </ul>
-                      </TableCell>
-                    <TableCell>{order.qty}</TableCell>
+                      <ul>
+                        {order.items.map((item, index) => (
+                          <li key={index}>
+                            {item.qty} x {item.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </TableCell>
                     <TableCell>{order.price}</TableCell>
                     <TableCell>
                       {new Date(order.date).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>{order.status}</TableCell>
+                    <TableCell>
+                      <Alert severity={getAlertSeverity(order.status)}>
+                        {order.status}
+                      </Alert>
+                    </TableCell>
+                    <TableCell>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleCloseClick(order.orderId)}
+                      aria-label="cancel"
+                    >
+                      <CancelIcon />
+                    </IconButton>
+                  </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
