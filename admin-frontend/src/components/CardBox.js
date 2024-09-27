@@ -41,7 +41,7 @@ import {
   MAX_TIME_IN_MINUTES,
 } from "../constants";
 
-const CardBox = ({ cid, title, name }) => {
+const CardBox = ({ cid, title, name, image }) => {
   const [open, setOpen] = useState(false);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -262,14 +262,14 @@ const CardBox = ({ cid, title, name }) => {
 
     //reset time on TV
     sendDuration(0, cid)
-    .then((data) => {
-      console.log("Duration sent successfully:", data);
-    })
-    .catch((error) => {
-      console.error("Error sending duration:", error.message);
-      setErrorMessage("Failed to send Time.");
-      setOpenSnackbar(true); // Show Snackbar with error message
-    });
+      .then((data) => {
+        console.log("Duration sent successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error sending duration:", error.message);
+        setErrorMessage("Failed to send Time.");
+        setOpenSnackbar(true); // Show Snackbar with error message
+      });
   };
 
   const handleSnackbarClose = () => {
@@ -279,16 +279,17 @@ const CardBox = ({ cid, title, name }) => {
   return (
     <div>
       <Card
-        sx={{ minWidth: 275 }}
+        sx={{ minWidth: 275, position: "relative", overflow: "hidden" }}
         className="shadow-lg rounded-lg overflow-hidden"
       >
-        <CardContent className="bg-gray-100 text-white p-6">
+        <CardContent className="bg-gray-200 text-white p-6">
           <Typography
             variant="h5"
             component="div"
             textAlign="center"
             color="text.secondary"
             gutterBottom
+            sx={{ position: "relative", zIndex: 1 }}
           >
             {title}
           </Typography>
@@ -297,7 +298,7 @@ const CardBox = ({ cid, title, name }) => {
               <Typography
                 className="text-center bg-white py-3"
                 variant="h4"
-                sx={{ fontWeight: "bold" }}
+                sx={{ fontWeight: "bold", position: "relative", zIndex: 1 }}
                 color="text.secondary"
               >
                 {formatRemainingTime(remainingTime)}
@@ -312,19 +313,25 @@ const CardBox = ({ cid, title, name }) => {
             <Typography
               className="text-center bg-white py-3"
               variant="h4"
-              sx={{ fontWeight: "bold"}}
+              sx={{ fontWeight: "bold", position: "relative", zIndex: 1,}}
               color="text.secondary"
             >
               OPEN
             </Typography>
           )}
           {startTime == null && (
-            <Typography sx={{ mt: 2 }} color="text.secondary">
+            <Typography
+              sx={{ mt: 2, position: "relative", zIndex: 1 }}
+              color="text.secondary"
+            >
               {name}
             </Typography>
           )}
         </CardContent>
-        <CardActions className="justify-between">
+        <CardActions
+          className="justify-between"
+          sx={{ position: "relative", zIndex: 1 }}
+        >
           <div>
             <Button
               variant="contained"
@@ -353,6 +360,22 @@ const CardBox = ({ cid, title, name }) => {
             </Button>
           </div>
         </CardActions>
+
+        {/* Background image with opacity */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.3,
+            zIndex: 0,
+          }}
+        />
       </Card>
 
       {/* Dialog Box to set timer */}
