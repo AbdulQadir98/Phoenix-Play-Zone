@@ -1,16 +1,22 @@
 {
   "name": "user-backend",
+  "description": "Phoennix Play Zone",
+  "author": "Meesal.ai",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
+  "bin": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
+  },
+  "pkg": {
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "dist"
   }
 }

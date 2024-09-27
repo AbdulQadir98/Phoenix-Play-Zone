@@ -11,6 +11,7 @@ const {
   addBookingDetails,
   deleteBookingById,
   updateBookingStatus,
+  getOrders,
   getCourt,
   setCourt,
   isCourtAvailable,
@@ -141,6 +142,19 @@ router.patch("/booking/:id/status", async (req, res) => {
     return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
+  }
+});
+
+// Get All Orders or Filter by Statuses
+router.get("/orders", async (req, res) => {
+  try {
+    let orders;
+    orders = await getOrders();
+    return res.status(200).json({ orders });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: err.message });
   }
 });
 

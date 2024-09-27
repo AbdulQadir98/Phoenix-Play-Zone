@@ -15,12 +15,11 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.yourapp.id",
+    "appId": "com.phoenix.id",
     "productName": "Phoenix",
     "files": [
       "main/",
-      "admin-frontend/build/",
-      "admin-backend/dist/admin-backend.exe"
+      "admin-frontend/build/"
     ],
     "directories": {
       "output": "dist"
