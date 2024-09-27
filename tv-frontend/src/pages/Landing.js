@@ -3,9 +3,17 @@ import { formatTime } from "../utils/timer.utils";
 import { PROD_API_URL } from "../constants";
 import TimerDisplay from "../components/TimerDisplay";
 import LandingDashboard from "../components/LandingDashboard";
-import warningSound from "../assets/warn.mp3"
+import warningSound from "../assets/warn.mp3";
 
 const Landing = () => {
+
+  let port;
+  try {
+    port = window.location.port;
+  } catch (error) {
+    console.error("An error occurred while retrieving the port:", error);
+  }
+
   const [remainingTime, setRemainingTime] = useState(0); // in seconds
   const [isReset, setIsReset] = useState(true); // state to track reset
   const hasWarned = useRef(false); // Ref to avoid multiple warnings
@@ -25,10 +33,14 @@ const Landing = () => {
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (parseInt(data.cid) === 1) {
+      if (parseInt(data.cid) === 1 && port === "3001") {
         setIsReset(data.duration === 0);
         setRemainingTime(data.duration);
         hasWarned.current = false; // Reset warning state when new time is set
+      } else if (parseInt(data.cid) === 2 && port === "3002") {
+        setIsReset(data.duration === 0);
+        setRemainingTime(data.duration);
+        hasWarned.current = false;
       }
     };
 
