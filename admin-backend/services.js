@@ -1,4 +1,96 @@
 const db = require("./firebase");
+const axios = require("axios");
+
+const companyLogin = "phoenixzone";
+const userLogin = "abdul.qadirv98@gmail.com";
+const userPassword = "Abdul@123";
+const LOGIN_API_URL = "https://user-api.simplybook.me/login";
+const ADMIN_API_URL = "https://user-api.simplybook.me/admin/";
+
+// Get the user token from the API
+const getUserToken = async () => {
+  try {
+    const response = await axios.post(LOGIN_API_URL, {
+      jsonrpc: "2.0",
+      method: "getUserToken",
+      params: {
+        companyLogin,
+        userLogin,
+        userPassword,
+      },
+      id: 1,
+    });
+    return response.data.result;
+  } catch (error) {
+    console.error(
+      "Error getting user token:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error('Unable to get user token');
+  }
+};
+
+// Fetch bookings from SimplyBookme
+const fetchWebBookings = async (page, pageSize, date_from, date_to) => {
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const token = await getUserToken();
+    if (!token) {
+      console.error("Unable to fetch token, aborting fetch bookings.");
+      return;
+    }
+
+    const response = await axios.post(
+      ADMIN_API_URL,
+      {
+        jsonrpc: "2.0",
+        method: "getBookings",
+        params: [
+          {
+            date_from: date_from, // Start date
+            date_to: date_to, // End date
+            booking_type: "all", // Get all bookings
+            order: "start_date", // Order by start date
+          },
+        ],
+        id: 1,
+      },
+      {
+        headers: {
+          "X-Company-Login": companyLogin,
+          "X-User-Token": token,
+        },
+      }
+    );
+
+    // bookingID: id or code?
+    if (response.data && response.data.result) {
+      const bookings = response.data.result.map((booking) => {
+        return {
+          booking_id: booking.code,
+          name: booking.client,
+          start_date: booking.start_date,
+          court: booking.unit,
+          status: booking.payment_status,
+          duration: booking.event_duration,
+          contact: booking.client_phone,
+          price: booking.event_price,
+        };
+      });
+
+      return bookings;
+    } else {
+      throw new Error("No bookings found in the response.");
+    }
+  } catch (error) {
+    console.error(
+      "Error fetching bookings:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error('Failed to fetch bookings');
+  }
+};
 
 const getBookings = async (page, pageSize) => {
   try {
@@ -234,6 +326,7 @@ const getRemainingTimes = async () => {
 };
 
 module.exports = {
+  fetchWebBookings,
   getBookings,
   getBookingsCount,
   getBookingsByStatus,

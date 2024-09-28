@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { fetchWebBookings, updateBookingStatus } from "../services/booking";
+import { fetchWebBookings } from "../services/booking";
+import { getAlertSeverity } from "../utils";
+import { ROWS_PER_PAGE, PRICE_PER_HOUR } from "../constants";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,27 +15,38 @@ import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import Alert from "@mui/material/Alert";
-import {
-  CircularProgress,
-  Snackbar,
-  IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
+import { CircularProgress, Snackbar } from "@mui/material";
 
-import {
-  formatTime,
-  formatDate,
-  formatDuration,
-  getAlertSeverity,
-} from "../utils";
+// Function to get today's date in 'YYYY-MM-DD' format
+const DateFormat = (date) => {
+  return date.toISOString().split("T")[0];
+};
 
-import { ROWS_PER_PAGE, PRICE_PER_HOUR } from "../constants";
+const formatDateToDDMMYYYY = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const formatTimeTo12Hour = (dateString) => {
+  const date = new Date(dateString);
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12; // Convert 0 hour to 12 for 12-hour format
+  return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
+};
+
+const convertMinutesToHours = (minutes) => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(
+    2,
+    "0"
+  )} H`;
+};
 
 const BookingTable = () => {
   const [bookings, setBookings] = useState([]);
@@ -44,19 +57,20 @@ const BookingTable = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
   const [loading, setLoading] = useState(false); // State for loading
-  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog visibility
-  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
-  const getBookings = async (page, pageSize) => {
+  const getRecentBookings = async (page, pageSize) => {
     setLoading(true);
     try {
-      const data = await fetchWebBookings(page, pageSize);
-      const processedBooking = data.bookings.map((booking) => ({
-        ...booking,
-        // TODO : remove this
-        amount: (booking.duration / 3600) * PRICE_PER_HOUR,
-      }));
-      setBookings(processedBooking);
+      // Get today's date and 3 days later
+      const today = new Date();
+      const fiveDaysLater = new Date(today);
+      fiveDaysLater.setDate(today.getDate() + 3);
+
+      const date_from = DateFormat(today);
+      const date_to = DateFormat(fiveDaysLater);
+
+      const data = await fetchWebBookings(page, pageSize, date_from, date_to);
+      setBookings(data.bookings);
       setTotalBookings(data.totalCount);
     } catch (error) {
       console.error("Error fetching web bookings:", error.message);
@@ -68,7 +82,7 @@ const BookingTable = () => {
   };
 
   useEffect(() => {
-    getBookings(page + 1, rowsPerPage);
+    getRecentBookings(page + 1, rowsPerPage);
   }, [page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
@@ -84,52 +98,11 @@ const BookingTable = () => {
     setSearchQuery(event.target.value);
   };
 
-  const handleCancelClick = async (bookingId) => {
-    setSelectedBookingId(bookingId);
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleDialogConfirm = async () => {
-    const endTime = new Date();
-    try {
-      const status = "CLOSED";
-      const response = await updateBookingStatus(
-        selectedBookingId,
-        status,
-        endTime
-      );
-      //refreshes the page/table
-      setBookings((prevBookings) =>
-        prevBookings.filter(
-          (booking) => booking.bookingId !== selectedBookingId
-        )
-      );
-      if (response.status === 200) {
-        console.log("Booking status updated successfully.");
-        // TODO : Optionally, can update the UI to reflect this change
-      } else {
-        console.error("Failed to update booking status.", response.data);
-        setErrorMessage("Failed to cancel booking. Please try again.");
-        setOpenSnackbar(true);
-      }
-    } catch (error) {
-      console.error("Error confirming booking cancel:", error.message);
-      setErrorMessage(`Error confirming booking cancel: ${error.message}`);
-      setOpenSnackbar(true);
-    } finally {
-      setDialogOpen(false);
-    }
-  };
-
   const filteredData = bookings.filter(
     (row) =>
-      row.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.court.toLowerCase().includes(searchQuery.toLowerCase()) ||
       row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.status.toLowerCase().includes(searchQuery.toLowerCase())
+      row.contact.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSnackbarClose = () => {
@@ -143,7 +116,7 @@ const BookingTable = () => {
         style={{ minWidth: "600px", maxWidth: "80%", margin: "auto" }}
       >
         <TextField
-          placeholder="Filter by Court, Name or Status"
+          placeholder="Filter by Court, Name or Contact"
           variant="outlined"
           fullWidth
           value={searchQuery}
@@ -163,66 +136,49 @@ const BookingTable = () => {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead className="bg-gray-200">
             <TableRow>
-              <TableCell>Court (Court ID)</TableCell>
-              <TableCell align="left">Name</TableCell>
-              <TableCell align="right">Contact No</TableCell>
-              <TableCell align="right">Booked Time</TableCell>
+              <TableCell>Court Name</TableCell>
+              <TableCell align="left">Date</TableCell>
+              <TableCell align="right">Time</TableCell>
               <TableCell align="right">Duration</TableCell>
+              <TableCell align="right">Name</TableCell>
+              <TableCell align="right">Contact</TableCell>
               <TableCell align="right">Amount&nbsp;(Rs.)</TableCell>
               <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Date</TableCell>
-              <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                {/* 9 should be dynamic */}
-                <TableCell colSpan={9} align="center">
+                {/* 8 should be dynamic */}
+                <TableCell colSpan={8} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
             ) : (
               filteredData.map((row, index) => (
                 <TableRow
-                  key={row.bookingId}
+                  key={index}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.title}
+                    {row.court}
                   </TableCell>
-                  <TableCell align="left">{row.name}</TableCell>
+                  <TableCell align="left">
+                    {formatDateToDDMMYYYY(row.start_date)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {formatTimeTo12Hour(row.start_date)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {convertMinutesToHours(row.duration)}
+                  </TableCell>
+                  <TableCell align="right">{row.name}</TableCell>
                   <TableCell align="right">{row.contact}</TableCell>
-                  <TableCell align="right">
-                    {formatTime(row.startTime)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatDuration(row.duration)}
-                  </TableCell>
-                  <TableCell align="right">{row.amount}</TableCell>
+                  <TableCell align="right">{row.price}</TableCell>
                   <TableCell align="right">
                     <Alert severity={getAlertSeverity(row.status)}>
                       {row.status}
                     </Alert>
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatDate(row.startTime)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {/* <IconButton
-                      color="primary"
-                      onClick={() => handleStartClick(row.bookingId)}
-                      aria-label="start"
-                    >
-                      <PlayArrowIcon />
-                    </IconButton> */}
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleCancelClick(row.bookingId)}
-                      aria-label="cancel"
-                    >
-                      <CancelIcon />
-                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -239,24 +195,6 @@ const BookingTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
-
-      {/* Dialog for confirming actions */}
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Confirm Cancel</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to Close the booking?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            No
-          </Button>
-          <Button onClick={handleDialogConfirm} color="primary" autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Snackbar for displaying error messages */}
       <Snackbar

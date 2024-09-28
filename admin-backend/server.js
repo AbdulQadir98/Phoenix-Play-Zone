@@ -31,5 +31,5 @@ app.use('/proxy', userProxy);
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Express server is running at http://localhost:${PORT}`);
+  console.log(`Admin server running at port: ${PORT}`);
 });

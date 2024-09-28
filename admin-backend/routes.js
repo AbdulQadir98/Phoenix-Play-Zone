@@ -3,6 +3,7 @@ const router = express.Router();
 
 //double check awaits and no else?
 const {
+  fetchWebBookings,
   getBookings,
   getBookingsCount,
   getBookingsByStatus,
@@ -19,10 +20,27 @@ const {
   DiplayCourts,
 } = require("./services");
 
-// Get All Bookings or Filter by Statuses
+// Get All Bookings from SimplyBookMe
+router.get("/bookings", async (req, res) => {
+  const { page = 1, pageSize = 5, date_from, date_to } = req.query;
+
+  try {
+    const bookings = await fetchWebBookings(parseInt(page), parseInt(pageSize), date_from, date_to);
+    if (!bookings) {
+      return res.status(404).json({ error: 'No bookings found' });
+    }
+    const totalCount = bookings.length;
+    res.status(200).json({ bookings, totalCount });
+  } catch (error) {
+    console.error("Error in /bookings route:", error.message);
+    res.status(500).json({ error: "Failed to fetch web bookings" });
+  }
+});
+
+// Get All Bookings or Filter by Statuses - Depreciated
 router.get("/booking", async (req, res) => {
   
-  const { status, page = 1, pageSize = 5 } = req.query; // Default to page 1 and 10 users per page
+  const { status, page = 1, pageSize = 5 } = req.query; // Default to page 1 and 5 users per page
 
   try {
     let bookings;

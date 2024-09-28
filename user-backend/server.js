@@ -71,5 +71,5 @@ app.post("/api/time/:cid", async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`User server running at port: ${PORT}`);
 });
