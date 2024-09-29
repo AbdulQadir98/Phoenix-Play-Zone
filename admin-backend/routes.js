@@ -135,7 +135,7 @@ router.patch("/booking/:id/status", async (req, res) => {
   const { status, endTime } = req.body;
 
   // Define allowed statuses
-  const allowedStatuses = ["NEW", "CLOSED", "PENDING", "CANCELLED", "COMPLETED"];
+  const allowedStatuses = ["NEW", "CLOSED", "PENDING", "CANCELLED", "COMPLETED", "DELETED"];
 
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ error: "Invalid status value." });
