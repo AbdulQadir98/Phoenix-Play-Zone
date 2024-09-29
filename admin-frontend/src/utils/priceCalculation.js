@@ -7,11 +7,11 @@ export const calculateTotalPrice = (startTime, duration, cid) => {
   
     // Fetch prices from localStorage
     const defaultPrices = [
-      { normal: 600, peak: 600 },
-      { normal: 600, peak: 600 },
-      { normal: 600, peak: 600 },
-      { normal: 600, peak: 600 },
-      { normal: 600, peak: 600 }
+      { normal: 3000, peak: 4000 },
+      { normal: 3000, peak: 4000 },
+      { normal: 800, peak: 1000 },
+      { normal: 2250, peak: 2250 },
+      { normal: 1250, peak: 1250 }
     ];
   
     let storedPrices;
