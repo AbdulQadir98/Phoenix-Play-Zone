@@ -136,12 +136,33 @@ const CardBox = ({ cid, title, name, image }) => {
     );
     setIsResetClicked(false); // reset the flag variable to default
 
+    // Fetch prices from localStorage
+    const defaultPrices = [600, 600, 600, 600, 600];
+    let storedPrices;
+
+    try {
+      const pricesFromStorage = localStorage.getItem("pricesPerHour");
+      storedPrices = pricesFromStorage ? JSON.parse(pricesFromStorage) : defaultPrices;
+  
+      // Check if the parsed data is an array and has the right length (5 courts)
+      if (!Array.isArray(storedPrices) || storedPrices.length !== defaultPrices.length) {
+        throw new Error("Invalid prices structure, falling back to default prices.");
+      }
+    } catch (error) {
+      console.error("Error fetching prices from localStorage:", error.message);
+      storedPrices = defaultPrices; // Fallback to default prices
+    }
+
+    // As cid corresponds to index++, we fetch the price per hour based on cid
+    const pricePerHour = storedPrices[cid-1];
+    const totalPrice = (pricePerHour / 60) * (duration / 60);
     const newBooking = {
       cid,
       title,
       startTime,
       status: "PENDING",
       duration,
+      price: totalPrice,
     };
     console.log(newBooking);
 
@@ -313,7 +334,7 @@ const CardBox = ({ cid, title, name, image }) => {
             <Typography
               className="text-center bg-white py-3"
               variant="h4"
-              sx={{ fontWeight: "bold", position: "relative", zIndex: 1,}}
+              sx={{ fontWeight: "bold", position: "relative", zIndex: 1 }}
               color="text.secondary"
             >
               OPEN

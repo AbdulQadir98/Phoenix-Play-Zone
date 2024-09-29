@@ -36,12 +36,7 @@ const BasicTable = () => {
     setLoading(true);
     try {
       const data = await fetchCompletedPendingCancelledBookings(page, pageSize);
-      const processedBooking = data.bookings.map((booking) => ({
-        ...booking,
-        amount: (booking.duration / 3600) * PRICE_PER_HOUR,
-        // endTime?
-      }));
-      setBookings(processedBooking);
+      setBookings(data.bookings);
       setTotalBookings(data.totalCount)
     } catch (error) {
       console.error("Error fetching completed bookings:", error.message);
@@ -137,7 +132,7 @@ const BasicTable = () => {
                   <TableCell align="right">
                     {formatDuration(row.duration)}
                   </TableCell>
-                  <TableCell align="right">{row.amount}</TableCell>
+                  <TableCell align="right">{row.price}</TableCell>
                   <TableCell align="right">{formatTime(row.endTime)}</TableCell>
                   <TableCell align="right">
                     <Alert severity={getAlertSeverity(row.status)}>
