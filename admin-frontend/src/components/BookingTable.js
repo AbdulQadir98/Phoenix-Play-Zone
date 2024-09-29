@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchWebBookings } from "../services/booking";
 import { getAlertSeverity } from "../utils";
-import { ROWS_PER_PAGE, PRICE_PER_HOUR } from "../constants";
+import { ROWS_PER_PAGE } from "../constants";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -18,8 +18,11 @@ import Alert from "@mui/material/Alert";
 import { CircularProgress, Snackbar } from "@mui/material";
 
 // Function to get today's date in 'YYYY-MM-DD' format
-const DateFormat = (date) => {
-  return date.toISOString().split("T")[0];
+const formatDateToYYYYMMDD = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const formatDateToDDMMYYYY = (dateString) => {
@@ -66,8 +69,8 @@ const BookingTable = () => {
       const fiveDaysLater = new Date(today);
       fiveDaysLater.setDate(today.getDate() + 3);
 
-      const date_from = DateFormat(today);
-      const date_to = DateFormat(fiveDaysLater);
+      const date_from = formatDateToYYYYMMDD(today);
+      const date_to = formatDateToYYYYMMDD(fiveDaysLater);
 
       const data = await fetchWebBookings(page, pageSize, date_from, date_to);
       setBookings(data.bookings);

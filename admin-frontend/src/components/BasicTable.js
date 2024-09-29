@@ -20,7 +20,7 @@ import {
   formatDuration,
   getAlertSeverity,
 } from "../utils";
-import { ROWS_PER_PAGE, PRICE_PER_HOUR } from '../constants';
+import { ROWS_PER_PAGE } from '../constants';
 
 const BasicTable = () => {
   const [bookings, setBookings] = useState([]);
