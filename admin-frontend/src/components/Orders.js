@@ -13,19 +13,24 @@ import {
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Alert from "@mui/material/Alert";
+import { CircularProgress } from "@mui/material";
 import { getAlertSeverity } from "../utils";
 
 const Orders = () => {
-  const [open, setOpen] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchOrders = async () => {
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:4000/orders");
       const data = await response.json();
       setOrders(data.orders);
     } catch (error) {
       console.error("Error fetching Orders:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,7 +45,7 @@ const Orders = () => {
   };
 
   const handleCloseClick = async (orderId) => {
-    console.log("Open Confirmation Box :", orderId)
+    console.log("Open Confirmation Box :", orderId);
   };
 
   return (
@@ -73,38 +78,47 @@ const Orders = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {orders.map((order) => (
-                  <TableRow key={order.orderId}>
-                    <TableCell>{order.customerName}</TableCell>
-                    <TableCell>
-                      <ul>
-                        {order.items.map((item, index) => (
-                          <li key={index}>
-                            {item.qty} x {item.name}
-                          </li>
-                        ))}
-                      </ul>
+                {loading ? (
+                  <TableRow>
+                    {/* 6 should be dynamic */}
+                    <TableCell colSpan={6} align="center">
+                      <CircularProgress />
                     </TableCell>
-                    <TableCell>{order.price}</TableCell>
-                    <TableCell>
-                      {new Date(order.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Alert severity={getAlertSeverity(order.status)}>
-                        {order.status}
-                      </Alert>
-                    </TableCell>
-                    <TableCell>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleCloseClick(order.orderId)}
-                      aria-label="cancel"
-                    >
-                      <CancelIcon />
-                    </IconButton>
-                  </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  orders.map((order) => (
+                    <TableRow key={order.orderId}>
+                      <TableCell>{order.customerName}</TableCell>
+                      <TableCell>
+                        <ul>
+                          {order.items.map((item, index) => (
+                            <li key={index}>
+                              {item.qty} x {item.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </TableCell>
+                      <TableCell>{order.price}</TableCell>
+                      <TableCell>
+                        {new Date(order.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Alert severity={getAlertSeverity(order.status)}>
+                          {order.status}
+                        </Alert>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleCloseClick(order.orderId)}
+                          aria-label="cancel"
+                        >
+                          <CancelIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>

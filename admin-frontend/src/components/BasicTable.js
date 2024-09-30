@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchCompletedPendingCancelledBookings } from "../services/booking";
+import { fetchCompletedPendingCancelledBookings, updateBookingStatus, } from "../services/booking";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,14 +13,24 @@ import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import Alert from "@mui/material/Alert";
-import { CircularProgress, Snackbar } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import {
+  CircularProgress,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import {
   formatTime,
   formatDate,
   formatDuration,
   getAlertSeverity,
 } from "../utils";
-import { ROWS_PER_PAGE } from '../constants';
+import { ROWS_PER_PAGE } from "../constants";
 
 const BasicTable = () => {
   const [bookings, setBookings] = useState([]);
@@ -31,13 +41,15 @@ const BasicTable = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
   const [loading, setLoading] = useState(false); // State for loading
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   const getBookings = async (page, pageSize) => {
     setLoading(true);
     try {
       const data = await fetchCompletedPendingCancelledBookings(page, pageSize);
       setBookings(data.bookings);
-      setTotalBookings(data.totalCount)
+      setTotalBookings(data.totalCount);
     } catch (error) {
       console.error("Error fetching completed bookings:", error.message);
       setErrorMessage(`Failed to fetch bookings: ${error.message}`);
@@ -74,6 +86,44 @@ const BasicTable = () => {
     setOpenSnackbar(false);
   };
 
+  const handleOpenDialog = (bookingId) => {
+    setSelectedBookingId(bookingId); // Set the selected booking ID
+    setOpenDialog(true); // Open the dialog
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Close the dialog
+    setSelectedBookingId(null); // Reset selected booking ID
+  };
+
+  const handleDeleteBooking = async () => {
+    try {
+      const endTime = new Date();
+      const status = "DELETED";
+
+      // removing booking from table
+      const response = await updateBookingStatus(selectedBookingId, status, endTime);
+
+      if (response.status === 200) {
+        console.log("Booking status updated successfully.");
+        // Optionally, you can update the UI to reflect this change
+      } else {
+        console.error("Failed to update booking status.", response.data);
+        setErrorMessage("Failed to end booking. Please try again.");
+        setOpenSnackbar(true); // Show Snackbar with error message
+      }
+
+      // Refresh the bookings after deletion
+      getBookings(page + 1, rowsPerPage);
+    } catch (error) {
+      console.error("Error deleting booking:", error.message);
+      setErrorMessage(`Failed to delete booking: ${error.message}`);
+      setOpenSnackbar(true);
+    } finally {
+      handleCloseDialog();
+    }
+  };
+
   return (
     <div>
       <TableContainer
@@ -108,12 +158,13 @@ const BasicTable = () => {
               <TableCell align="right">End Time</TableCell>
               <TableCell align="right">Status</TableCell>
               <TableCell align="right">Date</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} align="center">
+                <TableCell colSpan={8} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
@@ -142,6 +193,13 @@ const BasicTable = () => {
                   <TableCell align="right">
                     {formatDate(row.startTime)}
                   </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      onClick={() => handleOpenDialog(row.bookingId)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -168,6 +226,22 @@ const BasicTable = () => {
           {errorMessage}
         </Alert>
       </Snackbar>
+
+      {/* Dialog for confirming deletion */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this booking?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteBooking} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

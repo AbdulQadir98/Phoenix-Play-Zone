@@ -1,0 +1,66 @@
+get values fron .json + Client-> 
+    onclick links, tab names connection eka nisa
+    values like court number
+    min timer increment
+    price per hour (normal and peak)
+    pagination count eka
+
+Admin should be able to block time slots in app also (for other customers while waiting)
+
+Once a court is booked and it’s timer starts, it cannot be started again
+without clicking the ‘reset/end button’.
+Start Time cant click while running neh
+
+createdAt, updatedAt??
+
+Validation When Inpting
+    - set timer -values, type, ...
+
+[BUGS] 
+    - When 2 windows are open and operating
+    - DO NOT REFRESH PAGE - FIXED
+
+Without Internet Nothing works properly
+
+sendDuration() - what if it took too long or backend didnt work? timeouts!! -> axios
+
+Enhance Search Options: By select court, By Time Period
+
+isResetClicked needs to be persistence too right? yes 
+start time and refresh it it will never go disable
+[BUG] - start time -> change tab -> click reset n wait
+
+SET AUTO AUDIO PERMISSIONS in CHROME
+WENA ROUTER WADAK NA ONLY THIS HOSTPOT ADAALA NA
+Rename every thing from the Pearl to Phoenix
+
+getting orders uses fetch method use axios please!!
+
+machine ekai non ekai -> admin change price at that time
+
+check if in electron app, does price persist to get the last updated one even after closed app
+
+======================================================================
+
+per week trigger to delete records? + Report Generation? // can be done in another my own service neh
+
+the deleted status - deleted status booking records show in my app
+
+======================================================================
+
+** PROD DEPLOY **
+
+CRIC APP
+
+** Web Booking **
+
+calendar view for all bookings
+
+pagination in web bookings???
+
+Recurring ekei cart ekai Booking API response same da?
+test them and see (is cart like booking it again wage da? nm hondai)
+
+1 day prio booking better, so give a buffer margin to book relative to the current time
+
+in web booking after pay, they should not be able to cancel

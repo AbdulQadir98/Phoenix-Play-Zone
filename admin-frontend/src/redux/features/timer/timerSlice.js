@@ -16,7 +16,6 @@ const timerSlice = createSlice({
         remainingTime,
         bookingId,
         duration,
-        isResetDisabled: false,
         isEndDisabled: true,
       };
     },
@@ -37,7 +36,6 @@ const timerSlice = createSlice({
           startTime: null,
           remainingTime: null,
           bookingId: null,
-          isResetDisabled: true, // Disable reset button
           isEndDisabled: true, // Disable end button
         };
       }
@@ -49,21 +47,8 @@ const timerSlice = createSlice({
           startTime: null,
           remainingTime: null,
           bookingId: null,
-          isResetDisabled: true, // Disable reset button
           isEndDisabled: true, // Disable end button
         };
-      }
-    },
-    enableReset(state, action) {
-      const { cid } = action.payload;
-      if (state.timers[cid]) {
-        state.timers[cid].isResetDisabled = false;
-      }
-    },
-    disableReset(state, action) {
-      const { cid } = action.payload;
-      if (state.timers[cid]) {
-        state.timers[cid].isResetDisabled = true;
       }
     },
     enableEnd(state, action) {
@@ -86,8 +71,6 @@ export const {
   updateRemainingTime,
   resetTimer,
   endTimer,
-  enableReset,
-  disableReset,
   enableEnd,
   disableEnd,
 } = timerSlice.actions;

@@ -1,14 +1,16 @@
-import Alert from "@mui/material/Alert";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import { useState, useEffect } from "react";
+import {
+  Alert,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 const AdminSettings = () => {
   // Court names for 5 courts
@@ -20,9 +22,10 @@ const AdminSettings = () => {
     "Leather Court 2",
   ];
 
-  // Store prices for 5 courts
-  const [prices, setPrices] = useState([600, 600, 600, 600, 600]); // Default prices for each court
-  const [newPrice, setNewPrice] = useState("");
+  // Store prices for 5 courts (normal and peak prices)
+  const [prices, setPrices] = useState(Array(5).fill({ normal: 0, peak: 0 })); // Default prices
+  const [newNormalPrice, setNewNormalPrice] = useState("");
+  const [newPeakPrice, setNewPeakPrice] = useState("");
   const [selectedCourt, setSelectedCourt] = useState(null); // Court to update
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -34,22 +37,32 @@ const AdminSettings = () => {
     }
   }, []);
 
-  const handlePriceChange = (event) => {
-    setNewPrice(event.target.value);
+  const handleNormalPriceChange = (event) => {
+    setNewNormalPrice(event.target.value);
+  };
+
+  const handlePeakPriceChange = (event) => {
+    setNewPeakPrice(event.target.value);
   };
 
   const handleCourtSelection = (courtIndex) => {
     setSelectedCourt(courtIndex);
   };
 
-  // Save the new price to local storage for the selected court
+  // Save the new prices to local storage for the selected court
   const handleSubmit = () => {
-    if (newPrice && selectedCourt !== null) {
+    if ((newNormalPrice || newPeakPrice) && selectedCourt !== null) {
       const updatedPrices = [...prices];
-      updatedPrices[selectedCourt] = Number(newPrice);
+      if (newNormalPrice) {
+        updatedPrices[selectedCourt].normal = Number(newNormalPrice);
+      }
+      if (newPeakPrice) {
+        updatedPrices[selectedCourt].peak = Number(newPeakPrice);
+      }
       localStorage.setItem("pricesPerHour", JSON.stringify(updatedPrices));
       setPrices(updatedPrices);
-      setNewPrice("");
+      setNewNormalPrice("");
+      setNewPeakPrice("");
       setSelectedCourt(null);
     }
   };
@@ -64,8 +77,9 @@ const AdminSettings = () => {
 
   const handleConfirmClearData = () => {
     localStorage.clear();
-    setPrices([600, 600, 600, 600, 600]); // Reset prices to default
-    setNewPrice("");
+    setPrices(Array(5).fill({ normal: 0, peak: 0 })); // Reset prices to default
+    setNewNormalPrice("");
+    setNewPeakPrice("");
     setOpenDialog(false);
   };
 
@@ -112,7 +126,6 @@ const AdminSettings = () => {
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
                   alignItems: "center",
                 }}
               >
@@ -121,14 +134,36 @@ const AdminSettings = () => {
                   component="span"
                   sx={{ color: "#1976d2", fontSize: "1.75rem" }}
                 >
-                  {price}
+                  {price.normal}
                 </Typography>
                 <Typography
                   variant="body1"
                   component="span"
                   sx={{ fontSize: "1.25rem", marginLeft: "5px" }}
                 >
-                  LKR / hour
+                  LKR / hour (Normal)
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: "5px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  component="span"
+                  sx={{ color: "#d32f2f", fontSize: "1.75rem" }}
+                >
+                  {price.peak}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="span"
+                  sx={{ fontSize: "1.25rem", marginLeft: "5px" }}
+                >
+                  LKR / hour (Peak)
                 </Typography>
               </Box>
             </CardContent>
@@ -155,10 +190,17 @@ const AdminSettings = () => {
 
         <input
           type="number"
-          value={newPrice}
-          onChange={handlePriceChange}
+          value={newNormalPrice}
+          onChange={handleNormalPriceChange}
           className="border p-2 mt-2"
-          placeholder="Enter new price"
+          placeholder="Enter new normal price"
+        />
+        <input
+          type="number"
+          value={newPeakPrice}
+          onChange={handlePeakPriceChange}
+          className="border p-2 mt-2"
+          placeholder="Enter new peak price"
         />
         <button
           onClick={handleSubmit}
