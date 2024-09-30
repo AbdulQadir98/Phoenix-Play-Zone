@@ -20,7 +20,6 @@ import {
 import { formatStartTime, formatRemainingTime } from "../utils";
 import {
   sendBookingDetails,
-  deleteBooking,
   updateBookingStatus,
 } from "../services/booking";
 import { sendDuration } from "../services/timer";
@@ -30,24 +29,20 @@ import {
   updateRemainingTime,
   resetTimer,
   endTimer,
-  enableReset,
-  disableReset,
   enableEnd,
-  disableEnd,
 } from "../redux/features/timer/timerSlice";
 import {
   MIN_INCREMENT,
   MIN_TIME_IN_MINUTES,
   MAX_TIME_IN_MINUTES,
 } from "../constants";
+import { calculateTotalPrice } from "../utils/priceCalculation";
 
 const CardBox = ({ cid, title, name, image }) => {
   const [open, setOpen] = useState(false);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [endConfirmOpen, setEndConfirmOpen] = useState(false);
-  const [isResetClicked, setIsResetClicked] = useState(false); // flag click
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
 
@@ -57,13 +52,17 @@ const CardBox = ({ cid, title, name, image }) => {
     remainingTime = null,
     duration = null,
     bookingId = null,
-    isResetDisabled = true,
     isEndDisabled = true,
   } = useSelector((state) => state.timers.timers[cid] || {});
 
   // Convert startTimeString back to a Date object
   const startTime = startTimeString ? new Date(startTimeString) : null;
   const dispatch = useDispatch();
+
+  const handleTimeUp = () => {
+    dispatch(resetTimer({ cid }));
+    changeStatustoCompleted("COMPLETED"); // Update status to COMPLETED
+  };
 
   useEffect(() => {
     let timer;
@@ -87,12 +86,7 @@ const CardBox = ({ cid, title, name, image }) => {
       handleTimeUp();
     }
     return () => clearTimeout(timer);
-  }, [dispatch, startTime, remainingTime, duration, cid, isResetClicked]);
-
-  const handleTimeUp = () => {
-    dispatch(resetTimer({ cid }));
-    changeStatustoCompleted("COMPLETED"); // Update status to COMPLETED
-  };
+  }, [dispatch, startTime, remainingTime, duration, cid]);
 
   const changeStatustoCompleted = (status) => {
     const endTime = new Date();
@@ -134,28 +128,11 @@ const CardBox = ({ cid, title, name, image }) => {
         bookingId: null, // Will be updated after API response
       })
     );
-    setIsResetClicked(false); // reset the flag variable to default
 
-    // Fetch prices from localStorage
-    const defaultPrices = [600, 600, 600, 600, 600];
-    let storedPrices;
-
-    try {
-      const pricesFromStorage = localStorage.getItem("pricesPerHour");
-      storedPrices = pricesFromStorage ? JSON.parse(pricesFromStorage) : defaultPrices;
-  
-      // Check if the parsed data is an array and has the right length (5 courts)
-      if (!Array.isArray(storedPrices) || storedPrices.length !== defaultPrices.length) {
-        throw new Error("Invalid prices structure, falling back to default prices.");
-      }
-    } catch (error) {
-      console.error("Error fetching prices from localStorage:", error.message);
-      storedPrices = defaultPrices; // Fallback to default prices
-    }
-
-    // As cid corresponds to index++, we fetch the price per hour based on cid
-    const pricePerHour = storedPrices[cid-1];
-    const totalPrice = (pricePerHour / 60) * (duration / 60);
+    // Calculate the total price for the booking
+    const totalPrice = calculateTotalPrice(startTime, duration, cid);
+    console.log("Total Price: ", totalPrice)
+    
     const newBooking = {
       cid,
       title,
@@ -177,6 +154,7 @@ const CardBox = ({ cid, title, name, image }) => {
             bookingId: response.data.bookingId, // Update bookingId
           })
         );
+        dispatch(enableEnd({ cid })); // Enable the "End" button
         console.log(response.data.message + ": " + response.data.bookingId);
       })
       .catch((error) => {
@@ -185,19 +163,8 @@ const CardBox = ({ cid, title, name, image }) => {
         setOpenSnackbar(true); // Show Snackbar with error message
       })
       .finally(() => {
+        dispatch(enableEnd({ cid })); // Enable "End Time" button
         setOpen(false);
-        dispatch(enableReset({ cid })); // Enable "Reset" button
-        dispatch(disableEnd({ cid })); // Disable "End Time" button
-        setTimeout(() => {
-          dispatch(disableReset({ cid })); // Disable "Reset" button
-          // previous state, ensuring to get most up-to-date setIsResetClicked()
-          setIsResetClicked((prevIsResetClicked) => {
-            if (!prevIsResetClicked) {
-              dispatch(enableEnd({ cid })); // Enable "End Time" button
-            }
-            return prevIsResetClicked;
-          });
-        }, 10000); // 10 seconds
       });
 
     //send time duration to the TV
@@ -210,10 +177,6 @@ const CardBox = ({ cid, title, name, image }) => {
         setErrorMessage("Failed to send Time.");
         setOpenSnackbar(true); // Show Snackbar with error message
       });
-  };
-
-  const handleResetClick = () => {
-    setConfirmOpen(true);
   };
 
   const handleEndClick = () => {
@@ -261,37 +224,33 @@ const CardBox = ({ cid, title, name, image }) => {
     }
   };
 
-  const handleConfirmClose = () => {
-    setConfirmOpen(false);
-  };
+  // const handleConfirmReset = () => {
+  //   if (bookingId) {
+  //     deleteBooking(bookingId)
+  //       .then(() => {
+  //         console.log(`Booking for ${bookingId} deleted successfully.`);
+  //       })
+  //       .catch((error) => {
+  //         console.error(`Error deleting booking ${bookingId}`, error);
+  //         setErrorMessage("An error occurred while deleting the booking.");
+  //         setOpenSnackbar(true);
+  //       });
+  //   }
+  //   setIsResetClicked(true);
+  //   setConfirmOpen(false);
+  //   dispatch(resetTimer({ cid })); // Disable "Reset" button
 
-  const handleConfirmReset = () => {
-    if (bookingId) {
-      deleteBooking(bookingId)
-        .then(() => {
-          console.log(`Booking for ${bookingId} deleted successfully.`);
-        })
-        .catch((error) => {
-          console.error(`Error deleting booking ${bookingId}`, error);
-          setErrorMessage("An error occurred while deleting the booking.");
-          setOpenSnackbar(true);
-        });
-    }
-    setIsResetClicked(true);
-    setConfirmOpen(false);
-    dispatch(resetTimer({ cid })); // Disable "Reset" button
-
-    //reset time on TV
-    sendDuration(0, cid)
-      .then((data) => {
-        console.log("Duration sent successfully:", data);
-      })
-      .catch((error) => {
-        console.error("Error sending duration:", error.message);
-        setErrorMessage("Failed to send Time.");
-        setOpenSnackbar(true); // Show Snackbar with error message
-      });
-  };
+  //   //reset time on TV
+  //   sendDuration(0, cid)
+  //     .then((data) => {
+  //       console.log("Duration sent successfully:", data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error sending duration:", error.message);
+  //       setErrorMessage("Failed to send Time.");
+  //       setOpenSnackbar(true); // Show Snackbar with error message
+  //     });
+  // };
 
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
@@ -361,18 +320,10 @@ const CardBox = ({ cid, title, name, image }) => {
             >
               Start Time
             </Button>
-            <Button
-              variant="outlined"
-              sx={{ marginLeft: "10px" }}
-              onClick={handleResetClick}
-              disabled={isResetDisabled}
-            >
-              Reset
-            </Button>
           </div>
           <div>
             <Button
-              variant="outlined"
+              variant="contained"
               color="error"
               onClick={handleEndClick}
               disabled={isEndDisabled}
@@ -471,20 +422,6 @@ const CardBox = ({ cid, title, name, image }) => {
           >
             Start
           </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog Box for Reset Time Confirmation */}
-      <Dialog open={confirmOpen} onClose={handleConfirmClose}>
-        <DialogTitle>Reset Timer</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to reset the timer?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleConfirmClose}>Cancel</Button>
-          <Button onClick={handleConfirmReset}>Confirm</Button>
         </DialogActions>
       </Dialog>
 

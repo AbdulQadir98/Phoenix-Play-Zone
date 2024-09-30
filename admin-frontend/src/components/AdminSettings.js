@@ -23,7 +23,7 @@ const AdminSettings = () => {
   ];
 
   // Store prices for 5 courts (normal and peak prices)
-  const [prices, setPrices] = useState(Array(5).fill({ normal: 600, peak: 600 })); // Default prices
+  const [prices, setPrices] = useState(Array(5).fill({ normal: 0, peak: 0 })); // Default prices
   const [newNormalPrice, setNewNormalPrice] = useState("");
   const [newPeakPrice, setNewPeakPrice] = useState("");
   const [selectedCourt, setSelectedCourt] = useState(null); // Court to update
@@ -77,7 +77,7 @@ const AdminSettings = () => {
 
   const handleConfirmClearData = () => {
     localStorage.clear();
-    setPrices(Array(5).fill({ normal: 600, peak: 600 })); // Reset prices to default
+    setPrices(Array(5).fill({ normal: 0, peak: 0 })); // Reset prices to default
     setNewNormalPrice("");
     setNewPeakPrice("");
     setOpenDialog(false);
