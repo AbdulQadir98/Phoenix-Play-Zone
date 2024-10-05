@@ -6,7 +6,6 @@ import LandingDashboard from "../components/LandingDashboard";
 import warningSound from "../assets/warn.mp3";
 
 const Landing = () => {
-
   let port;
   try {
     port = window.location.port;
@@ -32,15 +31,18 @@ const Landing = () => {
     const eventSource = new EventSource(`${PROD_API_URL}/events`);
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (parseInt(data.cid) === 1 && port === "3001") {
-        setIsReset(data.duration === 0);
-        setRemainingTime(data.duration);
-        hasWarned.current = false; // Reset warning state when new time is set
-      } else if (parseInt(data.cid) === 2 && port === "3002") {
-        setIsReset(data.duration === 0);
-        setRemainingTime(data.duration);
-        hasWarned.current = false;
+      try {
+        const data = JSON.parse(event.data);
+        if (
+          (parseInt(data.cid) === 1 && port === "3001") ||
+          (parseInt(data.cid) === 2 && port === "3002")
+        ) {
+          setIsReset(data.duration === 0);
+          setRemainingTime(data.duration);
+          hasWarned.current = false; // Reset warning state when new time is set
+        }
+      } catch (error) {
+        console.error("Error parsing SSE data: ", error);
       }
     };
 
