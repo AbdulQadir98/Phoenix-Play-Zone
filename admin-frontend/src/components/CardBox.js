@@ -317,6 +317,7 @@ const CardBox = ({ cid, title, name, image }) => {
               variant="contained"
               color="primary"
               onClick={handleStartClick}
+              disabled={!isEndDisabled}
             >
               Start Time
             </Button>
