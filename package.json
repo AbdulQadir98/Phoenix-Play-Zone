@@ -1,6 +1,6 @@
 {
   "name": "phoenix-play-zone",
-  "description": "The Pearl Indoor Sports Club",
+  "description": "The Phoenix Indoor Sports Club",
   "author": "Meesal.ai",
   "version": "0.1.0",
   "main": "main/electron.js",

@@ -71,6 +71,8 @@ const BookingTable = () => {
 
       const date_from = formatDateToYYYYMMDD(today);
       const date_to = formatDateToYYYYMMDD(fiveDaysLater);
+      // const date_from = '2024-09-01';
+      // const date_to = '2024-09-31'
 
       const data = await fetchWebBookings(page, pageSize, date_from, date_to);
       setBookings(data.bookings);

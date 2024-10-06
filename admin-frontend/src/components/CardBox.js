@@ -18,10 +18,7 @@ import {
 } from "@mui/material";
 
 import { formatStartTime, formatRemainingTime } from "../utils";
-import {
-  sendBookingDetails,
-  updateBookingStatus,
-} from "../services/booking";
+import { sendBookingDetails, updateBookingStatus } from "../services/booking";
 import { sendDuration } from "../services/timer";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -45,6 +42,7 @@ const CardBox = ({ cid, title, name, image }) => {
   const [endConfirmOpen, setEndConfirmOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
+  const [loading, setLoading] = useState(false);
 
   // Get timer state from Redux store
   const {
@@ -116,6 +114,8 @@ const CardBox = ({ cid, title, name, image }) => {
   };
 
   const handleStartTimer = () => {
+    setLoading(true);
+
     const duration = hours * 3600 + minutes * 60;
     const startTime = new Date().toISOString(); // serialize Date
 
@@ -131,8 +131,8 @@ const CardBox = ({ cid, title, name, image }) => {
 
     // Calculate the total price for the booking
     const totalPrice = calculateTotalPrice(startTime, duration, cid);
-    console.log("Total Price: ", totalPrice)
-    
+    console.log("Total Price: ", totalPrice);
+
     const newBooking = {
       cid,
       title,
@@ -163,6 +163,7 @@ const CardBox = ({ cid, title, name, image }) => {
         setOpenSnackbar(true); // Show Snackbar with error message
       })
       .finally(() => {
+        setLoading(false); // End loading state
         dispatch(enableEnd({ cid })); // Enable "End Time" button
         setOpen(false);
       });
@@ -418,10 +419,9 @@ const CardBox = ({ cid, title, name, image }) => {
           <Button onClick={handleClose}>Cancel</Button>
           <Button
             onClick={handleStartTimer}
-            // TODO : uncomment this
-            // disabled={hours * 60 + minutes < 60}
+            disabled={loading || hours * 60 + minutes < 60}
           >
-            Start
+            {loading ? "Submitting..." : "Start"}
           </Button>
         </DialogActions>
       </Dialog>
