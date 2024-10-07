@@ -6,17 +6,11 @@ import LandingDashboard from "../components/LandingDashboard";
 import warningSound from "../assets/warn.mp3";
 
 const Landing = () => {
-  let port;
-  try {
-    port = window.location.port;
-  } catch (error) {
-    console.error("An error occurred while retrieving the port:", error);
-  }
-
+  const [isMatchStarted, setIsMatchStarted] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0); // in seconds
   const [isReset, setIsReset] = useState(true); // state to track reset
   const hasWarned = useRef(false); // Ref to avoid multiple warnings
-
+  
   // Load the warning sound
   const audio = new Audio(warningSound);
 
@@ -26,23 +20,27 @@ const Landing = () => {
     });
   };
 
+  let port;
+  try {
+    port = window.location.port;
+  } catch (error) {
+    console.error("An error occurred while retrieving the port:", error);
+  }
+
   // To listen to duration and reset
   useEffect(() => {
     const eventSource = new EventSource(`${PROD_API_URL}/events`);
-
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (
-          (parseInt(data.cid) === 1 && port === "3001") ||
-          (parseInt(data.cid) === 2 && port === "3002")
-        ) {
+        if ((parseInt(data.cid) === 1 && port === "3001") || (parseInt(data.cid) === 2 && port === "3002")) {
+          setIsMatchStarted(data.isMatchStarted);
           setIsReset(data.duration === 0);
           setRemainingTime(data.duration);
           hasWarned.current = false; // Reset warning state when new time is set
         }
       } catch (error) {
-        console.error("Error parsing SSE data: ", error);
+        console.error("Error parsing SSE data when listening to duration: ", error);
       }
     };
 
@@ -90,7 +88,11 @@ const Landing = () => {
       {isReset ? (
         <LandingDashboard />
       ) : (
-        <TimerDisplay timeString={timeString} remainingTime={remainingTime} />
+        <TimerDisplay
+          timeString={timeString}
+          remainingTime={remainingTime}
+          isMatchStarted={isMatchStarted}
+        />
       )}
     </>
   );

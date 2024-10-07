@@ -1,11 +1,7 @@
-import { useState } from "react";
-import Score from "./Score";
-
-const TimerDisplay = ({ timeString, remainingTime }) => {
-  const [isMatchStarted, setIsMatchStarted] = useState(false);
-
+const TimerDisplay = ({ timeString, remainingTime, isMatchStarted }) => {
+  console.log(remainingTime);
   const timerContainerStyle = {
-    height: isMatchStarted ? "60vh" : "100vh",
+    height: isMatchStarted? "60vh" : "100vh",
     margin: 0,
     backgroundColor: "#2c3e50",
     display: "flex",
@@ -35,22 +31,19 @@ const TimerDisplay = ({ timeString, remainingTime }) => {
   });
 
   return (
-    <>
-      <div style={timerContainerStyle}>
-        {timeString.map((char, index) =>
-          char === ":" ? (
-            <span key={index} style={{ fontSize: "10rem", color: "#ecf0f1" }}>
-              {char}
-            </span>
-          ) : (
-            <div key={index} style={getTimerStyle(remainingTime)}>
-              {char}
-            </div>
-          )
-        )}
-      </div>
-      {isMatchStarted && <Score />}
-    </>
+    <div style={timerContainerStyle}>
+      {timeString.map((char, index) =>
+        char === ":" ? (
+          <span key={index} style={{ fontSize: "10rem", color: "#ecf0f1" }}>
+            {char}
+          </span>
+        ) : (
+          <div key={index} style={getTimerStyle(remainingTime)}>
+            {char}
+          </div>
+        )
+      )}
+    </div>
   );
 };
 

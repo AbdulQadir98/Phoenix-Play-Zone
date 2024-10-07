@@ -36,10 +36,11 @@ Rename every thing from the Pearl to Phoenix
 
 getting orders uses fetch method use axios please!!
 
-machine ekai non ekai -> admin change price at that time
+machine ekai non ekai -> admin change price at that time OR 2 passwords??
 
 check if in electron app, does price persist to get the last updated one even after closed app
 
+remove ^ in versions
 ======================================================================
 
 per week trigger to delete records? + Report Generation? // can be done in another my own service neh
@@ -47,16 +48,19 @@ per week trigger to delete records? + Report Generation? // can be done in anoth
 the deleted status - deleted status booking records show in my app
 
 ======================================================================
+price logic improve [DONE] -> assumes peak hours are 5-12 as after 12 we are closed!
 
-** PROD DEPLOY **
+remove restaurant (FE n BE)
 
-CRIC APP
+** PROD DEPLOY ** and test (off router and reconnect and check behaviour)
 
-** Web Booking **
+CRIC APP -> time 0 => okkoma reset wenna ona score + ismatchstart
+
+** SimplyBookeME Web Booking **
 
 calendar view for all bookings
 
-pagination in web bookings???
+pagination in web bookings??? no need ne only recent ones are shown
 
 Recurring ekei cart ekai Booking API response same da?
 test them and see (is cart like booking it again wage da? nm hondai)
@@ -64,3 +68,20 @@ test them and see (is cart like booking it again wage da? nm hondai)
 1 day prio booking better, so give a buffer margin to book relative to the current time
 
 in web booking after pay, they should not be able to cancel
+
+
+===================================================
+
+ERROR HANDLE
+
+user BE -> server.js (SSE) // try catch?
+
+=====================================================
+
+PROD DEPLOY
+
+change IPs as for the PROD IP
+build 4 apps
+build electron app
+    build the react app -> npm build
+    package it (admin cmd) -> npm run package
