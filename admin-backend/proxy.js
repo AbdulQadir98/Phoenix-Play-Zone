@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 
-const PROD_API_URL = "http://192.168.1.120:5000"
+const PROD_API_URL = "http://192.168.8.120:5000"
 // const API_URL = "http://localhost:5000"
 
 router.post("/time/:cid", async (req, res) => {

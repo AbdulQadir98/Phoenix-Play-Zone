@@ -53,16 +53,20 @@ export const fetchWebBookings = async (page, pageSize, date_from, date_to) => {
 export const sendBookingDetails = (bookingDetails) => {
   return axios.post(PROD_API_URL + "/booking", {
     bookingDetails,
+  }, {
+    timeout: 6000 // 6 seconds
   });
 };
 
-export const deleteBooking = (id) => {
-  return axios.delete(PROD_API_URL + `/booking/${id}`);
-};
+// export const deleteBooking = (id) => {
+//   return axios.delete(PROD_API_URL + `/booking/${id}`);
+// };
 
 export const updateBookingStatus = (id, status, endTime) => {
   return axios.patch(PROD_API_URL + `/booking/${id}/status`, {
     status,
     endTime,
+  }, {
+    timeout: 6000 // 6 seconds timeout
   });
 };

@@ -19,6 +19,7 @@ const Settings = () => {
       setError("");
     } else {
       setError("Incorrect password");
+      setEnteredPassword(""); // clear input
     }
   };
 
