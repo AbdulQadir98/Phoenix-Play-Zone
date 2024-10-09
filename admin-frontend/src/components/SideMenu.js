@@ -21,14 +21,12 @@ import EventIcon from "@mui/icons-material/Event";
 import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
-import UpdateIcon from "@mui/icons-material/Update";
 
 import Courts from "../pages/Courts";
 import Book from "../pages/Book";
 import History from "../pages/History";
 import Notification from "../pages/Notification";
 import Settings from "../pages/Settings";
-import Update from "../pages/Update";
 
 const drawerWidth = 240;
 
@@ -171,7 +169,7 @@ export default function MiniDrawer() {
         </List>
         <Divider />
         <List>
-          {["History", "Notifications", "Settings", "Update"].map(
+          {["History", "Notifications", "Settings"].map(
             (text, index) => (
               <ListItem key={text} disablePadding sx={{ display: "block" }}>
                 <ListItemButton
@@ -192,7 +190,6 @@ export default function MiniDrawer() {
                     {text === "History" && <HistoryIcon />}
                     {text === "Notifications" && <NotificationsIcon />}
                     {text === "Settings" && <SettingsIcon />}
-                    {text === "Update" && <UpdateIcon />}
                   </ListItemIcon>
                   <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>
@@ -208,7 +205,6 @@ export default function MiniDrawer() {
         {selectedComponent === "history" && <History />}
         {selectedComponent === "notifications" && <Notification />}
         {selectedComponent === "settings" && <Settings/>}
-        {selectedComponent === "update" && <Update/>}
       </Box>
     </Box>
   );
