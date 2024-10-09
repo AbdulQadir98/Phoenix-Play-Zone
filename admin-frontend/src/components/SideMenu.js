@@ -18,7 +18,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SportsTennisIcon from "@mui/icons-material/SportsTennis";
 import EventIcon from "@mui/icons-material/Event";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -26,7 +25,6 @@ import UpdateIcon from "@mui/icons-material/Update";
 
 import Courts from "../pages/Courts";
 import Book from "../pages/Book";
-import Restaurant from "../pages/Restaurant";
 import History from "../pages/History";
 import Notification from "../pages/Notification";
 import Settings from "../pages/Settings";
@@ -146,7 +144,7 @@ export default function MiniDrawer() {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Courts", "Bookings", "Restaurant"].map((text, index) => (
+          {["Courts", "Bookings"].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 onClick={() => setSelectedComponent(text.toLowerCase())}
@@ -165,7 +163,6 @@ export default function MiniDrawer() {
                 >
                   {text === "Courts" && <SportsTennisIcon />}
                   {text === "Bookings" && <EventIcon />}
-                  {text === "Restaurant" && <RestaurantIcon />}
                 </ListItemIcon>
                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
@@ -208,7 +205,6 @@ export default function MiniDrawer() {
         <DrawerHeader />
         {selectedComponent === "courts" && <Courts />}
         {selectedComponent === "bookings" && <Book />}
-        {selectedComponent === "restaurant" && <Restaurant />}
         {selectedComponent === "history" && <History />}
         {selectedComponent === "notifications" && <Notification />}
         {selectedComponent === "settings" && <Settings/>}
