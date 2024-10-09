@@ -15,7 +15,8 @@ const allowedOrigins = [
 ];
 app.use(cors());
 
-let clients = []; // Store connected clients for SSE
+let scoreClients = []; // Store connected cric clients for SSE
+let timerClients = []; // Store connected time clients for SSE
 
 let isMatchStarted = false; 
 let scores = {
@@ -23,8 +24,8 @@ let scores = {
   2: { runs: 0, wickets: 0, balls: 0 },
 }; 
 
-// SSE Endpoint
-app.get("/events", (req, res) => {
+// SSE Endpoint for score updates
+app.get("/events/score", (req, res) => {
   // Set headers for SSE
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -34,17 +35,43 @@ app.get("/events", (req, res) => {
   res.write(`data: ${JSON.stringify({ isMatchStarted, scores })}\n\n`);
 
   // Add client to the list
-  clients.push(res);
+  scoreClients.push(res);
 
   // Remove client when the connection closes
   req.on("close", () => {
-    clients = clients.filter((client) => client !== res);
+    scoreClients = scoreClients.filter((client) => client !== res);
   });
 });
 
-// Send SSE notifications
-const sendSSE = (data) => {
-  clients.forEach((client) => {
+// SSE Endpoint for timer updates
+app.get("/events/timer", (req, res) => {
+  // Set headers for SSE
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Send the current state when the client connects
+  res.write(`data: ${JSON.stringify({ duration: 0 })}\n\n`);
+
+  // Add client to the list
+  timerClients.push(res);
+
+  // Remove client when the connection closes
+  req.on("close", () => {
+    timerClients = timerClients.filter((client) => client !== res);
+  });
+});
+
+// Send SSE notifications for score updates
+const sendScoreSSE = (data) => {
+  scoreClients.forEach((client) => {
+    client.write(`data: ${JSON.stringify(data)}\n\n`);
+  });
+};
+
+// Send SSE notifications for time updates
+const sendTimerSSE = (data) => {
+  timerClients.forEach((client) => {
     client.write(`data: ${JSON.stringify(data)}\n\n`);
   });
 };
@@ -65,7 +92,7 @@ app.post("/api/time/:cid", async (req, res) => {
         cid,
       };
 
-      sendSSE(responseMessage); // Notify TV Frontend via SSE
+      sendTimerSSE(responseMessage); // Notify TV Frontend via SSE
 
       // Send the response back to frontend1
       res.status(200).send(responseMessage);
@@ -87,7 +114,7 @@ app.post("/start-match/:cid", (req, res) => {
 
   isMatchStarted = true;
   scores[cid] = { runs: 0, wickets: 0, balls: 0 };
-  sendSSE({ isMatchStarted, scores, cid }); // Notify all clients
+  sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
   res.status(200).json({ message: "Match started", isMatchStarted });
 });
 
@@ -97,7 +124,7 @@ app.post("/reset-match/:cid", (req, res) => {
 
   isMatchStarted = false;
   scores[cid] = { runs: 0, wickets: 0, balls: 0 };
-  sendSSE({ isMatchStarted, scores, cid }); // Notify all clients
+  sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
   res.status(200).json({message: "Match reset", isMatchStarted, scores: scores[cid]});
 });
 
@@ -116,7 +143,7 @@ app.post("/update-score/:cid", (req, res) => {
     // Increment ball count after every update
     scores[cid].balls += 1;
 
-    sendSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
+    sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
     return res.status(200).json({ message: "Score updated", scores: scores[cid] });
   }
 
