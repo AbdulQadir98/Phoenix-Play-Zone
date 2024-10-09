@@ -29,7 +29,7 @@ const Landing = () => {
 
   // To listen to duration and reset
   useEffect(() => {
-    const eventSource = new EventSource(`${PROD_API_URL}/events`);
+    const eventSource = new EventSource(`${PROD_API_URL}/events/timer`);
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -80,6 +80,30 @@ const Landing = () => {
       clearInterval(intervalId); // Cleanup interval on component unmount
     };
   }, [remainingTime]);
+
+  // To flag match start, will trigger when score updates also!!
+  useEffect(() => {
+    const matchEventSource = new EventSource(`${PROD_API_URL}/events/score`);
+    matchEventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if ((parseInt(data.cid) === 1 && port === "3001") || (parseInt(data.cid) === 2 && port === "3002")) {
+          setIsMatchStarted(data.isMatchStarted);
+        }
+      } catch (error) {
+        console.error("Error parsing SSE data when listening to score: ", error);
+      }
+    };
+
+    matchEventSource.onerror = (error) => {
+      console.error("SSE error:", error);
+      // Implement reconnection logic if necessary
+    };
+
+    return () => {
+      matchEventSource.close(); // Clean up the SSE connection on component unmount
+    };
+  }, []); // Run only once on component mount
 
   const timeString = formatTime(remainingTime).split(""); // Split into individual digits
 

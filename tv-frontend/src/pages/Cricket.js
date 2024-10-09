@@ -20,7 +20,7 @@ const Cricket = () => {
 
   // to flag match start and set scores
   useEffect(() => {
-    const eventSource = new EventSource(`${PROD_API_URL}/events`);
+    const eventSource = new EventSource(`${PROD_API_URL}/events/score`);
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
