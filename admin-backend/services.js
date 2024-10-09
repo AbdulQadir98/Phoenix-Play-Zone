@@ -223,21 +223,6 @@ const updateBookingStatus = async (id, { status, endTime }) => {
   }
 };
 
-const getOrders = async () => {
-  try {
-    const snapshot = await db
-      .collection("orders")
-      .get();
-      return snapshot.docs.map((doc) => ({
-        orderId: doc.id, // Include the document ID
-        ...doc.data(), // Spread the document data
-      }));
-  } catch (error) {
-    console.error("Error fetching users:", error.message);
-    throw error;
-  }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 
 let courts = [];
@@ -335,7 +320,6 @@ module.exports = {
   addBookingDetails,
   deleteBookingById,
   updateBookingStatus,
-  getOrders,
   initCourts,
   getCourt,
   setCourt,
