@@ -34,7 +34,6 @@ const Landing = () => {
       try {
         const data = JSON.parse(event.data);
         if ((parseInt(data.cid) === 1 && port === "3001") || (parseInt(data.cid) === 2 && port === "3002")) {
-          setIsMatchStarted(data.isMatchStarted);
           setIsReset(data.duration === 0);
           setRemainingTime(data.duration);
           hasWarned.current = false; // Reset warning state when new time is set
@@ -61,8 +60,10 @@ const Landing = () => {
     const intervalId = setInterval(() => {
       setRemainingTime((prevTime) => {
         const newTime = prevTime - 1; // Decrement the time
+        // TODO: have to reset the match and scores
         if (newTime <= 0) {
           clearInterval(intervalId); // Stop interval when time is 0
+          setIsMatchStarted(false) 
           setIsReset(true);
           return 0; // Ensure the time is exactly 0
         }

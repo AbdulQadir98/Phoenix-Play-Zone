@@ -1,5 +1,4 @@
 const TimerDisplay = ({ timeString, remainingTime, isMatchStarted }) => {
-  console.log(remainingTime);
   const timerContainerStyle = {
     height: isMatchStarted? "60vh" : "100vh",
     margin: 0,
