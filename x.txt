@@ -7,10 +7,6 @@ get values fron .json + Client->
 
 Admin should be able to block time slots in app also (for other customers while waiting)
 
-Once a court is booked and it’s timer starts, it cannot be started again
-without clicking the ‘reset/end button’.
-Start Time cant click while running neh
-
 createdAt, updatedAt??
 
 Validation When Inpting
@@ -20,7 +16,6 @@ Validation When Inpting
     - When 2 windows are open and operating
     - DO NOT REFRESH PAGE - FIXED
 
-Without Internet Nothing works properly
 
 sendDuration() - what if it took too long or backend didnt work? timeouts!! -> axios
 
@@ -33,8 +28,6 @@ start time and refresh it it will never go disable
 SET AUTO AUDIO PERMISSIONS in CHROME
 WENA ROUTER WADAK NA ONLY THIS HOSTPOT ADAALA NA
 Rename every thing from the Pearl to Phoenix
-
-getting orders uses fetch method use axios please!!
 
 machine ekai non ekai -> admin change price at that time OR 2 passwords??
 
@@ -50,15 +43,14 @@ the deleted status - deleted status booking records show in my app
 ======================================================================
 price logic improve [DONE] -> assumes peak hours are 5-12 as after 12 we are closed!
 
-remove restaurant (FE n BE)
+timeouts FE services wala
+setMessage() + network not connected in initial page?
 
 ** PROD DEPLOY ** and test (off router and reconnect and check behaviour)
 
-CRIC APP -> time 0 => okkoma reset wenna ona score + ismatchstart
-
 ** SimplyBookeME Web Booking **
 
-calendar view for all bookings
+view for all bookings?? calander view??
 
 pagination in web bookings??? no need ne only recent ones are shown
 
@@ -81,7 +73,9 @@ user BE -> server.js (SSE) // try catch?
 PROD DEPLOY
 
 change IPs as for the PROD IP
-build 4 apps
+build all apps (5) // npm run build & pkg .
 build electron app
     build the react app -> npm build
     package it (admin cmd) -> npm run package
+
+In App Add the court prices (localstorage)
