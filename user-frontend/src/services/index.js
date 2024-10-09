@@ -25,11 +25,12 @@ export const resetMatch = async (cid) => {
     }
 };
 
-export const updateScore = async (cid, increment, isWicket) => {
+export const updateScore = async (cid, increment, isWicket, isWide = false) => {
     try {
         const response = await axios.post(`${PROD_API_URL}/update-score/${cid}`, {
             increment,
-            isWicket
+            isWicket,
+            isWide
         }, {
             timeout: 4000 // 4 seconds timeout
         });

@@ -63,6 +63,16 @@ const Home = () => {
     }
   };
 
+  const handleWide = async () => {
+    try {
+      const data = await updateScore(cid, 1, false, true);
+      setMessage("Wide ball, 1 run");
+    } catch (error) {
+      console.log(error.message);
+      setMessage("Error updating wide ball");
+    }
+  };
+
   const handleOpenDialog = () => {
     setOpenDialog(true);
   };
@@ -121,7 +131,22 @@ const Home = () => {
               </Grid>
             ))}
             <Grid item xs={4} sm={3}>
-              <Card sx={{ height: 100, backgroundColor: "#e91e63", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={handleWicket}>
+              <Card
+                sx={{ height: 100, backgroundColor: "#2c3e50", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={handleWide}
+              >
+                <CardContent>
+                  <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+                    Wide
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={4} sm={3}>
+              <Card 
+                sx={{ height: 100, backgroundColor: "#e91e63", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+                onClick={handleWicket}
+              >
                 <CardContent>
                   <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                     Wicket

@@ -130,7 +130,7 @@ app.post("/reset-match/:cid", (req, res) => {
 
 // Endpoint to update the score
 app.post("/update-score/:cid", (req, res) => {
-  const { increment, isWicket } = req.body;
+  const { increment, isWicket, isWide } = req.body;
   const { cid } = req.params;
 
   if (isMatchStarted) {
@@ -140,8 +140,10 @@ app.post("/update-score/:cid", (req, res) => {
       scores[cid].runs += increment; // Update the score
     }
 
-    // Increment ball count after every update
-    scores[cid].balls += 1;
+    // Increment ball count only if it's not a wide
+    if (!isWide) {
+      scores[cid].balls += 1;
+    }
 
     sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
     return res.status(200).json({ message: "Score updated", scores: scores[cid] });
