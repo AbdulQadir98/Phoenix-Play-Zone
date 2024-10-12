@@ -15,14 +15,14 @@ export const fetchCompletedPendingCancelledBookings = async (page, pageSize) => 
   }
 };
 
-export const fetchWebBookings = async (page, pageSize) => {
+export const fetchWebBookings = async () => {
   try {
-    const response = await axios.get(PROD_API_URL + "/booking", {
-      params: { status: "PAID", page, pageSize },
+    const response = await axios.get(PROD_API_URL + "/bookings", {
+      params: { status: "PAID" },
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching Web bookings:", error.message);
+    console.error("Error fetching Web bookings without pagination:", error.message);
     throw error;
   }
 };

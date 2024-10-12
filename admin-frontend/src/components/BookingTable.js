@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchRecentWebBookings } from "../services/booking";
-import { getAlertSeverity } from "../utils";
+import {
+  formatDateToYYYYMMDD,
+  formatDateToDDMMYYYY,
+  formatTimeTo12Hour,
+  convertMinutesToHours,
+  getAlertSeverity,
+} from "../utils";
 import { ROWS_PER_PAGE } from "../constants";
 
 import Table from "@mui/material/Table";
@@ -16,42 +22,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import Alert from "@mui/material/Alert";
 import { CircularProgress, Snackbar } from "@mui/material";
-
-// Function to get today's date in 'YYYY-MM-DD' format
-const formatDateToYYYYMMDD = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const formatDateToDDMMYYYY = (dateString) => {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-const formatTimeTo12Hour = (dateString) => {
-  const date = new Date(dateString);
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12; // Convert 0 hour to 12 for 12-hour format
-  return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
-};
-
-const convertMinutesToHours = (seconds) => {
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-
-  const formattedHours = hours.toString().padStart(2, "0");
-  const formattedMinutes = mins.toString().padStart(2, "0");
-
-  return `${formattedHours} H ${formattedMinutes} mins`;
-};
 
 const BookingTable = () => {
   const [bookings, setBookings] = useState([]);
@@ -81,7 +51,7 @@ const BookingTable = () => {
       setTotalBookings(data.totalCount);
     } catch (error) {
       console.error("Error fetching web bookings:", error.message);
-      setErrorMessage(`Failed to fetch bookings: ${error.message}`);
+      setErrorMessage(`Failed to fetch Recent bookings: ${error.message}`);
       setOpenSnackbar(true); // Show Snackbar with error message
     } finally {
       setLoading(false); // Set loading to false after fetch

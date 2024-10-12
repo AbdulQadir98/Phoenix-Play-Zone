@@ -10,6 +10,7 @@ const {
   getBookingsByStatusCount,
   getBookingsByStatusAndDate,
   getBookingsByStatusAndDateCount,
+  getAllBookingsByStatus,
   getBookingById,
   addBookingDetails,
   deleteBookingById,
@@ -22,7 +23,7 @@ const {
 } = require("./services");
 
 // Get All Bookings from SimplyBookMe (Depreciated)
-router.get("/bookings", async (req, res) => {
+router.get("/simplybookme-bookings", async (req, res) => {
   const { page = 1, pageSize = 5, date_from, date_to } = req.query;
 
   try {
@@ -33,7 +34,7 @@ router.get("/bookings", async (req, res) => {
     const totalCount = bookings.length;
     res.status(200).json({ bookings, totalCount });
   } catch (error) {
-    console.error("Error in /bookings route:", error.message);
+    console.error("Error in simplybookme route:", error.message);
     res.status(500).json({ error: "Failed to fetch web bookings" });
   }
 });
@@ -57,6 +58,28 @@ router.get("/booking", async (req, res) => {
     }
     // console.log(bookings + " " + totalCount);
     return res.status(200).json({ bookings, totalCount });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: err.message });
+  }
+});
+
+// Get All Bookings or Filter by Statuses without pagination
+router.get("/bookings", async (req, res) => {
+  
+  const { status } = req.query; 
+
+  try {
+    let bookings;
+
+    if (status) {
+      const statusArray = status.split(",");
+      bookings = await getAllBookingsByStatus(statusArray);
+    } else {
+      return res.status(500).json({error: "No status specified", message: err.message});
+    }
+    return res.status(200).json({ bookings});
   } catch (err) {
     res
       .status(500)

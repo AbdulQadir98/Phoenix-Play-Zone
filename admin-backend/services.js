@@ -194,6 +194,25 @@ const getBookingsByStatusAndDateCount = async (status, date_from, date_to) => {
   }
 };
 
+// no pagination
+const getAllBookingsByStatus = async (status) => {
+  try {
+    const snapshot = await db
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .orderBy("startTime", "desc")
+      .get();
+
+      return snapshot.docs.map((doc) => ({
+        bookingId: doc.id,
+        ...doc.data(),
+      }));
+  } catch (error) {
+    console.error("Error fetching bookings by status without pagination:", error.message);
+    throw error;
+  }
+};
+
 const getBookingById = async (id) => {
   try {
     const bookingDoc = await db.collection("bookingDetails").doc(id).get();
@@ -356,6 +375,7 @@ module.exports = {
   getBookingsByStatusCount,
   getBookingsByStatusAndDate,
   getBookingsByStatusAndDateCount,
+  getAllBookingsByStatus,
   getBookingById,
   addBookingDetails,
   deleteBookingById,

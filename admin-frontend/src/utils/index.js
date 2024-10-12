@@ -95,6 +95,41 @@ export const formatRemainingTime = (seconds) => {
     .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
+export const formatTimeTo12Hour = (dateString) => {
+  const date = new Date(dateString);
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12; // Convert 0 hour to 12 for 12-hour format
+  return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
+};
+
+export const convertMinutesToHours = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = mins.toString().padStart(2, "0");
+
+  return `${formattedHours} H ${formattedMinutes} mins`;
+};
+
+export const formatDateToYYYYMMDD = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const formatDateToDDMMYYYY = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 // Locally Storing Court Details for Persistence
 export const saveToLocalStorage = (key, value) => {
   try {
