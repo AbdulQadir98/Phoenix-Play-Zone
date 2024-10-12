@@ -39,8 +39,6 @@ started but server off , snackbar eka ei after 6 seconds neh (timrout) then endt
 
 ============================== SimplyBookeME Web Booking ==============================
 
-pagination in web bookings??? no need ne only recent ones are shown
-
 Recurring ekei cart ekai Booking API response same da?
 test them and see (is cart like booking it again wage da? nm hondai)
 
@@ -57,10 +55,9 @@ the deleted status - deleted status booking records show in my app
 ======================================================================
 price logic improve [DONE] -> assumes peak hours are 5-12 as after 12 we are closed!
 
-timeouts FE services wala
-setMessage() + network not connected in initial page?
+timeouts FE services wala [OK]
 
-** PROD DEPLOY ** and test (off router and reconnect and check behaviour)
+** PROD DEPLOY ** (TEST : off router and reconnect and check behaviour)
 
 ===================================================
 

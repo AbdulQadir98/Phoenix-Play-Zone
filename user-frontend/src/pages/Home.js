@@ -13,6 +13,7 @@ import {
 
 const Home = () => {
   const [isMatchStarted, setIsMatchStarted] = useState(false);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -28,14 +29,14 @@ const Home = () => {
 
   const handleStartMatch = async () => {
     try {
-      const data = await startMatch(cid) 
-      // setMessage(data.message);
+      const data = await startMatch(cid);
       setMessage("MATCH STARTED");
       setIsMatchStarted(true);
+      setError("");
     } catch (error) {
-      console.log(error.message)
-      setMessage("Error starting match");
-    } 
+      console.log(error.message);
+      setError("NETWORK ERROR! TRY AGAIN");
+    }
     // finally {
     //   setLoading(false);
     // }
@@ -91,7 +92,6 @@ const Home = () => {
       setMessage("Error reseting match");
     } 
     finally {
-      // setLoading(false);
       handleCloseDialog();
     }
   };
@@ -103,14 +103,17 @@ const Home = () => {
       </div>
 
       {!isMatchStarted ? (
-        <Button
+        <>
+          <Button
           variant="contained"
           color="primary"
           onClick={handleStartMatch}
           fullWidth
-        >
-          Start Match
-        </Button>
+          >
+            Start Match
+          </Button>
+          {error && <center className="text-red-500 mt-6">{error}</center>}
+        </>
       ) : (
         <Box sx={{
           mt: 1, display: 'flex',
