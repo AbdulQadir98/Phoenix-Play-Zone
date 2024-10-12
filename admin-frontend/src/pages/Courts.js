@@ -2,11 +2,11 @@ import CardBox from "../components/CardBox";
 import court1 from "../assets/futsal-court.webp";
 
 const cardData = [
-  { cid: 1, title: "Court 1 : Futsal Court", name: "This is the first Court", image: court1 },
-  { cid: 2, title: "Court 2 : Futsal Court", name: "This is the second Court", image: court1 },
-  { cid: 3, title: "Court 3 : Badminton Court", name: "This is the third Court", image: court1 },
-  { cid: 4, title: "Court 4 : Leather Court", name: "This is the fourth Court", image: court1 },
-  { cid: 5, title: "Court 5 : Leather Court", name: "This is the fifth Court", image: court1},
+  { cid: 1, title: "Court 1 : Futsal Court", name: "Entrance Futsal Court", image: court1 },
+  { cid: 2, title: "Court 2 : Futsal Court", name: "Inner Futsal Court", image: court1 },
+  { cid: 3, title: "Court 3 : Badminton Court", name: "Indoor Badminton Court", image: court1 },
+  { cid: 4, title: "Court 4 : Leather Court", name: "Machine Leather Ball Court", image: court1 },
+  { cid: 5, title: "Court 5 : Leather Court", name: "Normal Leather Court", image: court1},
 ];
 
 const Courts = () => {
