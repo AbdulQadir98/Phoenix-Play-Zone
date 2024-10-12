@@ -34,6 +34,20 @@ machine ekai non ekai -> admin change price at that time OR 2 passwords??
 check if in electron app, does price persist to get the last updated one even after closed app
 
 remove ^ in versions
+
+started but server off , snackbar eka ei after 6 seconds neh (timrout) then endtimer delete it and start again
+
+============================== SimplyBookeME Web Booking ==============================
+
+pagination in web bookings??? no need ne only recent ones are shown
+
+Recurring ekei cart ekai Booking API response same da?
+test them and see (is cart like booking it again wage da? nm hondai)
+
+1 day prio booking better, so give a buffer margin to book relative to the current time
+
+in web booking after pay, they should not be able to cancel
+
 ======================================================================
 
 per week trigger to delete records? + Report Generation? // can be done in another my own service neh
@@ -48,20 +62,6 @@ setMessage() + network not connected in initial page?
 
 ** PROD DEPLOY ** and test (off router and reconnect and check behaviour)
 
-** SimplyBookeME Web Booking **
-
-view for all bookings?? calander view??
-
-pagination in web bookings??? no need ne only recent ones are shown
-
-Recurring ekei cart ekai Booking API response same da?
-test them and see (is cart like booking it again wage da? nm hondai)
-
-1 day prio booking better, so give a buffer margin to book relative to the current time
-
-in web booking after pay, they should not be able to cancel
-
-
 ===================================================
 
 ERROR HANDLE
@@ -72,6 +72,7 @@ user BE -> server.js (SSE) // try catch?
 
 PROD DEPLOY
 
+remove console.logs
 change IPs as for the PROD IP
 build all apps (5) // npm run build & pkg .
 build electron app
