@@ -81,24 +81,33 @@ const CalanderView = () => {
               <div className="py-3">Check Internet Connection</div>
             </div>
           ) : (
-            <div>
-              <div className="flex justify-center py-4">
+            <div className="w-full">
+              <div className="flex justify-center py-2 bg-gray-100 rounded-md">
                 <Calendar onChange={setSelectedDate} value={selectedDate} />
               </div>
 
-              <div className="p-2">
-                <strong>Date: {selectedDate.toDateString()}</strong>
-              </div>
-              <div className="p-2">
+              <div className="py-2 mt-4 space-y-4">
                 {filteredBookings.length > 0 ? (
                   filteredBookings.map((booking, index) => (
-                    <div key={index} className="py-2">
-                      <div>Time: {formatTimeTo12Hour(booking.startTime)}</div>
-                      <div>Duration: {convertMinutesToHours(booking.duration)}</div>
+                    <div
+                      key={index}
+                      className="py-2 px-3 border border-gray-100 rounded-lg bg-gray-700"
+                    >
+                      <div className="text-gray-100">
+                        {booking.title}
+                      </div>
+                      <div className="text-gray-300">
+                        Time: {formatTimeTo12Hour(booking.startTime)}
+                      </div>
+                      <div className="text-gray-300">
+                        Duration: {convertMinutesToHours(booking.duration)}
+                      </div>
                     </div>
                   ))
                 ) : (
-                  <div>No bookings for this date.</div>
+                  <div className="text-center text-gray-500">
+                    No bookings for this date.
+                  </div>
                 )}
               </div>
             </div>
