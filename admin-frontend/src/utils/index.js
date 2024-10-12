@@ -67,10 +67,8 @@ export const getAlertSeverity = (status) => {
       return "warning";
     case "PENDING":
       return "info";
-    case "NEW":
-      return "info";
-    case "CLOSED":
-      return "warning";
+    case "DELETED":
+      return "error";
     default:
       return "success";
   }

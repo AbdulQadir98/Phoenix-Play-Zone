@@ -3,11 +3,13 @@ const router = express.Router();
 
 //double check awaits and no else?
 const {
-  fetchWebBookings,
+  fetchSimplyWebBookings,
   getBookings,
   getBookingsCount,
   getBookingsByStatus,
   getBookingsByStatusCount,
+  getBookingsByStatusAndDate,
+  getBookingsByStatusAndDateCount,
   getBookingById,
   addBookingDetails,
   deleteBookingById,
@@ -19,12 +21,12 @@ const {
   DiplayCourts,
 } = require("./services");
 
-// Get All Bookings from SimplyBookMe
+// Get All Bookings from SimplyBookMe (Depreciated)
 router.get("/bookings", async (req, res) => {
   const { page = 1, pageSize = 5, date_from, date_to } = req.query;
 
   try {
-    const bookings = await fetchWebBookings(parseInt(page), parseInt(pageSize), date_from, date_to);
+    const bookings = await fetchSimplyWebBookings(parseInt(page), parseInt(pageSize), date_from, date_to);
     if (!bookings) {
       return res.status(404).json({ error: 'No bookings found' });
     }
@@ -36,7 +38,7 @@ router.get("/bookings", async (req, res) => {
   }
 });
 
-// Get All Bookings or Filter by Statuses - Depreciated
+// Get All Bookings or Filter by Statuses
 router.get("/booking", async (req, res) => {
   
   const { status, page = 1, pageSize = 5 } = req.query; // Default to page 1 and 5 users per page
@@ -52,6 +54,33 @@ router.get("/booking", async (req, res) => {
     } else {
       bookings = await getBookings(parseInt(page), parseInt(pageSize));
       totalCount = await getBookingsCount();
+    }
+    // console.log(bookings + " " + totalCount);
+    return res.status(200).json({ bookings, totalCount });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: err.message });
+  }
+});
+
+// Get Bookings for a specific date range
+router.get("/range-booking", async (req, res) => {
+  
+  const { status, page = 1, pageSize = 5, date_from, date_to  } = req.query; // Default to page 1 and 5 users per page
+
+  try {
+    let bookings;
+    let totalCount;
+
+    const statusArray = status ? status.split(",") : ["PENDING", "COMPLETED", "CANCELLED", "DELETED", "PAID"];
+
+    if (date_from && date_to) {
+      bookings = await getBookingsByStatusAndDate(statusArray, date_from, date_to, parseInt(page), parseInt(pageSize));
+      totalCount = await getBookingsByStatusAndDateCount(statusArray, date_from, date_to);
+      // totalCount = 100
+    } else {
+      return res.status(500).json({error: "No date range specified", message: err.message});
     }
     // console.log(bookings + " " + totalCount);
     return res.status(200).json({ bookings, totalCount });
@@ -134,7 +163,7 @@ router.patch("/booking/:id/status", async (req, res) => {
   const { status, endTime } = req.body;
 
   // Define allowed statuses
-  const allowedStatuses = ["NEW", "CLOSED", "PENDING", "CANCELLED", "COMPLETED", "DELETED"];
+  const allowedStatuses = ["PENDING", "CANCELLED", "COMPLETED", "DELETED", "PAID"];
 
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ error: "Invalid status value." });

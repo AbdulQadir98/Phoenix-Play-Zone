@@ -31,7 +31,7 @@ const getUserToken = async () => {
 };
 
 // Fetch bookings from SimplyBookme
-const fetchWebBookings = async (page, pageSize, date_from, date_to) => {
+const fetchSimplyWebBookings = async (page, pageSize, date_from, date_to) => {
   const offset = (page - 1) * pageSize;
 
   try {
@@ -152,6 +152,44 @@ const getBookingsByStatusCount = async (status) => {
     return snapshot.size;
   } catch (error) {
     console.error("Error fetching bookings by status count:", error.message);
+    throw error;
+  }
+};
+
+const getBookingsByStatusAndDate = async (status, date_from, date_to, page, pageSize) => {
+  try {
+    const offset = (page - 1) * pageSize;
+    const snapshot = await db
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .where("startTime", ">=", date_from)
+      .where("startTime", "<=", date_to)
+      .orderBy("startTime", "asc")
+      .offset(offset)
+      .limit(pageSize)
+      .get();
+
+      return snapshot.docs.map((doc) => ({
+        bookingId: doc.id,
+        ...doc.data(),
+      }));
+  } catch (error) {
+    console.error("Error fetching bookings by range:", error.message);
+    throw error;
+  }
+};
+
+const getBookingsByStatusAndDateCount = async (status, date_from, date_to) => {
+  try {
+    const snapshot = await db
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .where("startTime", ">=", date_from)
+      .where("startTime", "<=", date_to)
+      .get();
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error fetching bookings by range count:", error.message);
     throw error;
   }
 };
@@ -311,11 +349,13 @@ const getRemainingTimes = async () => {
 };
 
 module.exports = {
-  fetchWebBookings,
+  fetchSimplyWebBookings,
   getBookings,
   getBookingsCount,
   getBookingsByStatus,
   getBookingsByStatusCount,
+  getBookingsByStatusAndDate,
+  getBookingsByStatusAndDateCount,
   getBookingById,
   addBookingDetails,
   deleteBookingById,

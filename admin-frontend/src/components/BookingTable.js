@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchWebBookings } from "../services/booking";
+import { fetchRecentWebBookings } from "../services/booking";
 import { getAlertSeverity } from "../utils";
 import { ROWS_PER_PAGE } from "../constants";
 
@@ -42,13 +42,15 @@ const formatTimeTo12Hour = (dateString) => {
   return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
 };
 
-const convertMinutesToHours = (minutes) => {
+const convertMinutesToHours = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(
-    2,
-    "0"
-  )} H`;
+  const mins = minutes % 60;
+
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = mins.toString().padStart(2, "0");
+
+  return `${formattedHours} H ${formattedMinutes} mins`;
 };
 
 const BookingTable = () => {
@@ -66,15 +68,15 @@ const BookingTable = () => {
     try {
       // Get today's date and 3 days later
       const today = new Date();
-      const fiveDaysLater = new Date(today);
-      fiveDaysLater.setDate(today.getDate() + 3);
+      const tommorrow = new Date(today);
+      tommorrow.setDate(today.getDate() + 2);
 
       const date_from = formatDateToYYYYMMDD(today);
-      const date_to = formatDateToYYYYMMDD(fiveDaysLater);
-      // const date_from = '2024-09-01';
-      // const date_to = '2024-09-31'
-
-      const data = await fetchWebBookings(page, pageSize, date_from, date_to);
+      const date_to = formatDateToYYYYMMDD(tommorrow);
+      // const date_from = '2024-10-01';
+      // const date_to = '2024-10-31'
+      
+      const data = await fetchRecentWebBookings(page, pageSize, date_from, date_to);
       setBookings(data.bookings);
       setTotalBookings(data.totalCount);
     } catch (error) {
@@ -105,9 +107,8 @@ const BookingTable = () => {
 
   const filteredData = bookings.filter(
     (row) =>
-      row.court.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.contact.toLowerCase().includes(searchQuery.toLowerCase())
+      row.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSnackbarClose = () => {
@@ -121,7 +122,7 @@ const BookingTable = () => {
         style={{ minWidth: "600px", maxWidth: "80%", margin: "auto" }}
       >
         <TextField
-          placeholder="Filter by Court, Name or Contact"
+          placeholder="Filter by Court or Name"
           variant="outlined"
           fullWidth
           value={searchQuery}
@@ -166,13 +167,13 @@ const BookingTable = () => {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.court}
+                    {row.title}
                   </TableCell>
                   <TableCell align="left">
-                    {formatDateToDDMMYYYY(row.start_date)}
+                    {formatDateToDDMMYYYY(row.startTime)}
                   </TableCell>
                   <TableCell align="right">
-                    {formatTimeTo12Hour(row.start_date)}
+                    {formatTimeTo12Hour(row.startTime)}
                   </TableCell>
                   <TableCell align="right">
                     {convertMinutesToHours(row.duration)}
