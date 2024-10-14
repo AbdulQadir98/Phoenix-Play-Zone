@@ -35,7 +35,11 @@ check if in electron app, does price persist to get the last updated one even af
 
 remove ^ in versions
 
-started but server off , snackbar eka ei after 6 seconds neh (timrout) then endtimer delete it and start again
+started time but server was off, snackbar eka ei after 6 seconds neh (timeout) 
+then endtime delete it and start again
+
+booked for 1H @8 came late start time @8 for 1H needs to be done
+booking reference by eke pattern eke teach him to check from table
 
 ============================== SimplyBookeME Web Booking ==============================
 
