@@ -19,7 +19,6 @@ const {
   setCourt,
   isCourtAvailable,
   getRemainingTimes,
-  DiplayCourts,
 } = require("./services");
 
 // Get All Bookings from SimplyBookMe (Depreciated)

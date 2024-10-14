@@ -379,5 +379,4 @@ module.exports = {
   setCourt,
   isCourtAvailable,
   getRemainingTimes,
-  DiplayCourts,
 };
