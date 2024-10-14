@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { resetMatch, startMatch, updateScore } from "../services";
+import { resetMatch, startMatch, updateScore, undoScore } from "../services";
 import Grid from '@mui/material/Grid';
+import UndoIcon from '@mui/icons-material/Undo';
+import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import {
   Container,
   Button,
@@ -21,7 +23,7 @@ const Home = () => {
   try {
     port = window.location.port;
   } catch (error) {
-    console.error("An error occurred while retrieving the port:", error);
+    console.error("An error occurred while retrieving the port");
   }
 
   // assume user apps are in ports 3101 and 3102
@@ -29,48 +31,54 @@ const Home = () => {
 
   const handleStartMatch = async () => {
     try {
-      const data = await startMatch(cid);
+      await startMatch(cid);
       setMessage("MATCH STARTED");
       setIsMatchStarted(true);
       setError("");
     } catch (error) {
-      console.log(error.message);
       setError("NETWORK ERROR! TRY AGAIN");
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
   const handleUpdateScore = async (increment) => {
     try {
-      const data = updateScore(cid, increment, false)
+      await updateScore(cid, increment, false)
       // setMessage(data.message);
       setMessage("Scored " + increment + " runs");
     } catch (error) {
-      console.log(error.message)
       setMessage("Error updating score");
     }
   };
 
   const handleWicket = async () => {
     try {
-      const data = updateScore(cid, 0, true)
+      await updateScore(cid, 0, true)
       // setMessage(data.message);
       setMessage("Get Outta Here");
     } catch (error) {
-      console.log(error.message)
       setMessage("Error updating wicket");
     }
   };
 
   const handleWide = async () => {
     try {
-      const data = await updateScore(cid, 1, false, true);
+      await updateScore(cid, 1, false, true);
       setMessage("Wide ball, 1 run");
     } catch (error) {
-      console.log(error.message);
       setMessage("Error updating wide ball");
+    }
+  };
+
+  const handleUndoScore = async () => {
+    try {
+      await undoScore(cid);
+      setMessage("Last action undone");
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setMessage("Nothing to undo");
+      } else {
+        setMessage("Error undoing last action");
+      }
     }
   };
 
@@ -84,11 +92,10 @@ const Home = () => {
 
   const handleConfirmResetMatch = async () => {
     try {
-      const data = await resetMatch(cid)
+      await resetMatch(cid)
       setMessage("");
       setIsMatchStarted(false);
     } catch (error) {
-      console.log(error.message)
       setMessage("Error reseting match");
     } 
     finally {
@@ -150,9 +157,23 @@ const Home = () => {
                 sx={{ height: 100, backgroundColor: "#e91e63", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
                 onClick={handleWicket}
               >
-                <CardContent>
+                <CardContent sx={{ display: 'flex', flexDirection:'column', alignItems: 'center' }}>
+                  <SportsCricketIcon sx={{ color: 'white', fontSize: { xs: '2rem', sm: '3rem' }, mr: 1 }} />
                   <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                     Wicket
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={4} sm={3}>
+              <Card
+                sx={{ height: 100, backgroundColor: "#f39c12", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={handleUndoScore}
+              >
+                <CardContent sx={{ display: 'flex', flexDirection:'column', alignItems: 'center' }}>
+                  <UndoIcon sx={{ color: 'white', fontSize: { xs: '2rem', sm: '3rem' }, mr: 1 }} />
+                  <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+                    Undo
                   </Typography>
                 </CardContent>
               </Card>

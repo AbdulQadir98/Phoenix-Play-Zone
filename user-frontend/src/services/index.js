@@ -37,3 +37,15 @@ export const updateScore = async (cid, increment, isWicket, isWide = false) => {
         throw error;
     }
 };
+
+export const undoScore = async (cid) => {
+    try {
+      const response = await axios.post(`${PROD_API_URL}/undo-score/${cid}`, {}, {
+        timeout: 4000,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+  

@@ -23,6 +23,10 @@ let scores = {
   1: { runs: 0, wickets: 0, balls: 0 },
   2: { runs: 0, wickets: 0, balls: 0 },
 }; 
+let scoreHistory = {
+  1: [], 
+  2: [],
+};
 
 // SSE Endpoint for score updates
 app.get("/events/score", (req, res) => {
@@ -109,48 +113,82 @@ app.post("/api/time/:cid", async (req, res) => {
 // ************** user score app backend **************
 
 // Endpoint to start the match
-app.post("/start-match/:cid", (req, res) => {
-  const { cid } = req.params;
-
-  isMatchStarted = true;
-  scores[cid] = { runs: 0, wickets: 0, balls: 0 };
-  sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
-  res.status(200).json({ message: "Match started", isMatchStarted });
+app.post("/start-match/:cid", async (req, res) => {
+  try {
+    const { cid } = req.params;
+  
+    isMatchStarted = true;
+    scores[cid] = { runs: 0, wickets: 0, balls: 0 };
+    sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
+    res.status(200).json({ message: "Match started", isMatchStarted });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
 });
 
 // Endpoint to reset the match
 app.post("/reset-match/:cid", (req, res) => {
-  const { cid } = req.params;
-
-  isMatchStarted = false;
-  scores[cid] = { runs: 0, wickets: 0, balls: 0 };
-  sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
-  res.status(200).json({message: "Match reset", isMatchStarted, scores: scores[cid]});
+  try {
+    const { cid } = req.params;
+  
+    isMatchStarted = false;
+    scores[cid] = { runs: 0, wickets: 0, balls: 0 };
+    scoreHistory[cid] = [];
+    sendScoreSSE({ isMatchStarted, scores, cid }); // Notify all clients
+    res.status(200).json({message: "Match reset", isMatchStarted, scores: scores[cid]});
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
 });
 
 // Endpoint to update the score
 app.post("/update-score/:cid", (req, res) => {
-  const { increment, isWicket, isWide } = req.body;
-  const { cid } = req.params;
-
-  if (isMatchStarted) {
-    if (isWicket) {
-      scores[cid].wickets += 1; // Increment wickets
-    } else {
-      scores[cid].runs += increment; // Update the score
+  try {
+    const { increment, isWicket, isWide } = req.body;
+    const { cid } = req.params;
+  
+    if (isMatchStarted) {
+      // Save current score in history
+      scoreHistory[cid].push({ ...scores[cid] });
+  
+      if (isWicket) {
+        scores[cid].wickets += 1; // Increment wickets
+      } else {
+        scores[cid].runs += increment; // Update the score
+      }
+  
+      // Increment ball count only if it's not a wide
+      if (!isWide) {
+        scores[cid].balls += 1;
+      }
+  
+      sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
+      return res.status(200).json({ message: "Score updated", scores: scores[cid] });
     }
-
-    // Increment ball count only if it's not a wide
-    if (!isWide) {
-      scores[cid].balls += 1;
-    }
-
-    sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
-    return res.status(200).json({ message: "Score updated", scores: scores[cid] });
+  
+    res.status(400).json({ message: "Match not started" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
   }
-
-  res.status(400).json({ message: "Invalid request or match not started" });
 });
+
+app.post("/undo-score/:cid", (req, res) => {
+  try {
+    const { cid } = req.params;
+  
+    if (scoreHistory[cid] && scoreHistory[cid].length > 0) {
+      // Restore the previous state
+      scores[cid] = scoreHistory[cid].pop();
+      sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients
+      return res.status(200).json({ message: "Undo successful", scores: scores[cid] });
+    }
+  
+    res.status(400).json({ message: "Nothing to undo" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
