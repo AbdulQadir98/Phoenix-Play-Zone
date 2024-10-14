@@ -22,10 +22,10 @@ const getUserToken = async () => {
     });
     return response.data.result;
   } catch (error) {
-    console.error(
-      "Error getting user token:",
-      error.response ? error.response.data : error.message
-    );
+    // console.error(
+    //   "Error getting user token:",
+    //   error.response ? error.response.data : error.message
+    // );
     throw new Error('Unable to get user token');
   }
 };
@@ -37,7 +37,7 @@ const fetchSimplyWebBookings = async (page, pageSize, date_from, date_to) => {
   try {
     const token = await getUserToken();
     if (!token) {
-      console.error("Unable to fetch token, aborting fetch bookings.");
+      // console.error("Unable to fetch token, aborting fetch bookings.");
       return;
     }
 
@@ -84,10 +84,10 @@ const fetchSimplyWebBookings = async (page, pageSize, date_from, date_to) => {
       throw new Error("No bookings found in the response.");
     }
   } catch (error) {
-    console.error(
-      "Error fetching bookings:",
-      error.response ? error.response.data : error.message
-    );
+    // console.error(
+    //   "Error fetching bookings:",
+    //   error.response ? error.response.data : error.message
+    // );
     throw new Error('Failed to fetch bookings');
   }
 };
@@ -106,7 +106,7 @@ const getBookings = async (page, pageSize) => {
         ...doc.data(), // Spread the document data
       }));
   } catch (error) {
-    console.error("Error fetching users:", error.message);
+    // console.error("Error fetching users:", error.message);
     throw error;
   }
 };
@@ -292,13 +292,7 @@ const initCourts = () => {
       startTime: null,
       duration: null,
     }));
-  console.log(courts);
 };
-
-// for Debug Purpose
-function DiplayCourts() {
-  console.log(courts);
-}
 
 const getCourt = async (courtNumber) => {
   try {

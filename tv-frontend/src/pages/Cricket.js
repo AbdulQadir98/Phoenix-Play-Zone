@@ -24,7 +24,6 @@ const Cricket = () => {
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log("HERE ",data)
         if (
           (parseInt(data.cid) === 1 && port === "3001") ||
           (parseInt(data.cid) === 2 && port === "3002")

@@ -8,7 +8,6 @@ export const startMatch = async (cid) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error starting match:", error.message);
         throw error;
     }
 };
@@ -20,7 +19,6 @@ export const resetMatch = async (cid) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error reseting match:", error.message);
         throw error;
     }
 };
@@ -36,7 +34,6 @@ export const updateScore = async (cid, increment, isWicket, isWide = false) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error updating score", error.message);
         throw error;
     }
 };

@@ -17,7 +17,7 @@ router.post("/time/:cid", async (req, res) => {
     // Get the response from server 5000 back to the admin
     res.json(response.data);
   } catch (error) {
-    console.error("Error proxying request to server 5000:", error.message);
+    // console.error("Error proxying request to server 5000:", error.message);
     res.status(500).send("Internal Server Error");
   }
 });

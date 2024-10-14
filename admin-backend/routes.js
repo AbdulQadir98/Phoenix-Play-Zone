@@ -34,7 +34,7 @@ router.get("/simplybookme-bookings", async (req, res) => {
     const totalCount = bookings.length;
     res.status(200).json({ bookings, totalCount });
   } catch (error) {
-    console.error("Error in simplybookme route:", error.message);
+    // console.error("Error in simplybookme route:", error.message);
     res.status(500).json({ error: "Failed to fetch web bookings" });
   }
 });
@@ -173,7 +173,7 @@ router.delete("/booking/:id", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error deleting booking:", error.message);
+    // console.error("Error deleting booking:", error.message);
     return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
@@ -207,7 +207,7 @@ router.patch("/booking/:id/status", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error updating booking status:", error.message);
+    // console.error("Error updating booking status:", error.message);
     return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
@@ -271,10 +271,9 @@ router.post("/allocate/:courtNumber", async (req, res) => {
     setCourt(courtNumber, court);
     res.json(court);
   } catch (error) {
-    console.error("Error allocating court: ", error);
+    // console.error("Error allocating court: ", error);
     res.status(500).send("Internal Server Error");
   }
-  console.log("Allocated Successfully", DiplayCourts());
 });
 
 // Release a court
@@ -287,7 +286,6 @@ router.patch("/release/:courtNumber", async (req, res) => {
 
   try {
     const court = await getCourt(courtNumber);
-    console.log(court);
     if (!court || !court.isAllocated) {
       return res.status(400).json({ error: "Court is not allocated" });
     }
@@ -300,7 +298,6 @@ router.patch("/release/:courtNumber", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
-  console.log("Released Successfully", DiplayCourts());
 });
 
 // Update time
@@ -327,7 +324,6 @@ router.patch("/court/:courtNumber", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
-  console.log("Updated Successfully", DiplayCourts());
 });
 
 // Get remaining time for a court
@@ -353,7 +349,6 @@ router.get("/time/:courtNumber", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
-  console.log("Check Remaining Time Completed", DiplayCourts());
 });
 
 module.exports = router;
