@@ -297,7 +297,7 @@ const CardBox = ({ cid, title, name, image }) => {
               sx={{ fontWeight: "bold", position: "relative", zIndex: 1 }}
               color="text.secondary"
             >
-              OPEN
+              FREE
             </Typography>
           )}
           {startTime == null && (

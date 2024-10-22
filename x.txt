@@ -77,7 +77,7 @@ remove console.logs
 change IPs as for the PROD IP
 build all apps (5) // npm run build & pkg .
 build electron app
-    build the react app -> npm build
+    build the react app -> npm build [DONE]
     package it (admin cmd) -> npm run package
 
 In App Add the court prices (localstorage)
