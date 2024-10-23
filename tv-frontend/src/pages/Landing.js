@@ -4,19 +4,28 @@ import { PROD_API_URL } from "../constants";
 import TimerDisplay from "../components/TimerDisplay";
 import LandingDashboard from "../components/LandingDashboard";
 import warningSound from "../assets/warn.mp3";
+import welcomeSound from "../assets/welcome.mp3"; 
 
 const Landing = () => {
   const [isMatchStarted, setIsMatchStarted] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0); // in seconds
   const [isReset, setIsReset] = useState(true); // state to track reset
   const hasWarned = useRef(false); // Ref to avoid multiple warnings
+  const hasWelcomed = useRef(false);
   
   // Load the warning sound
-  const audio = new Audio(warningSound);
+  const warningAudio = new Audio(warningSound);
+  const welcomeAudio = new Audio(welcomeSound);
 
-  const playAudio = () => {
-    audio.play().catch((error) => {
+  const playWarningAudio = () => {
+    warningAudio.play().catch((error) => {
       console.error("Audio playback failed :", error);
+    });
+  };
+
+  const playWelcomeAudio = () => {
+    welcomeAudio.play().catch((error) => {
+      console.error("Welcome audio playback failed :", error);
     });
   };
 
@@ -37,6 +46,14 @@ const Landing = () => {
           setIsReset(data.duration === 0);
           setRemainingTime(data.duration);
           hasWarned.current = false; // Reset warning state when new time is set
+          
+          // Play the welcome audio as soon as the timer is set
+          if (data.duration > 0 && !hasWelcomed.current) {
+            playWelcomeAudio();
+            hasWelcomed.current = true; // Ensure welcome sound plays only once for the set timer
+          } else if (data.duration === 0) {
+            hasWelcomed.current = false; // Reset to allow welcome sound to play again if duration is set again
+          }
         }
       } catch (error) {
         console.error("Error parsing SSE data when listening to duration: ", error);
@@ -73,7 +90,7 @@ const Landing = () => {
 
     // Check if the remaining time is less than 15 minutes and warn
     if (remainingTime <= 900 && !hasWarned.current) {
-      playAudio();
+      playWarningAudio();
       hasWarned.current = true; // Prevent further warnings
     }
 
