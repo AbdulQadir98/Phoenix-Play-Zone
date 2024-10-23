@@ -1,17 +1,5 @@
 import { useState } from "react";
 import { resetMatch, startMatch, updateScore, undoScore } from "../services";
-import Grid from '@mui/material/Grid';
-import UndoIcon from '@mui/icons-material/Undo';
-import SportsCricketIcon from '@mui/icons-material/SportsCricket';
-import {
-  Container,
-  Button,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
-} from "@mui/material";
 
 const Home = () => {
   const [isMatchStarted, setIsMatchStarted] = useState(false);
@@ -26,7 +14,6 @@ const Home = () => {
     console.error("An error occurred while retrieving the port");
   }
 
-  // assume user apps are in ports 3101 and 3102
   const cid = port === "3101" ? 1 : 2;
 
   const handleStartMatch = async () => {
@@ -42,8 +29,7 @@ const Home = () => {
 
   const handleUpdateScore = async (increment) => {
     try {
-      await updateScore(cid, increment, false)
-      // setMessage(data.message);
+      await updateScore(cid, increment, false);
       setMessage("Scored " + increment + " runs");
     } catch (error) {
       setMessage("Error updating score");
@@ -52,8 +38,7 @@ const Home = () => {
 
   const handleWicket = async () => {
     try {
-      await updateScore(cid, 0, true)
-      // setMessage(data.message);
+      await updateScore(cid, 0, true);
       setMessage("Get Outta Here");
     } catch (error) {
       setMessage("Error updating wicket");
@@ -92,129 +77,78 @@ const Home = () => {
 
   const handleConfirmResetMatch = async () => {
     try {
-      await resetMatch(cid)
+      await resetMatch(cid);
       setMessage("");
       setIsMatchStarted(false);
     } catch (error) {
-      setMessage("Error reseting match");
-    } 
-    finally {
+      setMessage("Error resetting match");
+    } finally {
       handleCloseDialog();
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ minHeight: "100vh", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div className="font-mono p-6 text-center text-2xl text-bold">
-        Phoenix Cric App
-      </div>
+    <div className="container">
+      <div className="title">Phoenix Cric App</div>
 
       {!isMatchStarted ? (
         <>
-          <Button
-          variant="contained"
-          color="primary"
-          onClick={handleStartMatch}
-          fullWidth
-          >
+          <button className="start-btn" onClick={handleStartMatch}>
             Start Match
-          </Button>
-          {error && <center className="text-red-500 mt-6">{error}</center>}
+          </button>
+          {error && <center className="error-msg">{error}</center>}
         </>
       ) : (
-        <Box sx={{
-          mt: 1, display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <Grid container spacing={2} justifyContent="center">
+        <div className="score-section">
+          <div className="button-grid">
             {[1, 2, 3, 4, 6].map((increment) => (
-              <Grid item xs={4} sm={3} key={increment}>
-                <Card sx={{ height: 100, backgroundColor: "#2e2e2e", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => handleUpdateScore(increment)}>
-                  <CardContent>
-                    <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                      {increment}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <button
+                key={increment}
+                className="score-btn"
+                onClick={() => handleUpdateScore(increment)}
+              >
+                {increment}
+              </button>
             ))}
-            <Grid item xs={4} sm={3}>
-              <Card
-                sx={{ height: 100, backgroundColor: "#2c3e50", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onClick={handleWide}
-              >
-                <CardContent>
-                  <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                    Wide
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={4} sm={3}>
-              <Card 
-                sx={{ height: 100, backgroundColor: "#e91e63", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
-                onClick={handleWicket}
-              >
-                <CardContent sx={{ display: 'flex', flexDirection:'column', alignItems: 'center' }}>
-                  <SportsCricketIcon sx={{ color: 'white', fontSize: { xs: '2rem', sm: '3rem' }, mr: 1 }} />
-                  <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                    Wicket
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={4} sm={3}>
-              <Card
-                sx={{ height: 100, backgroundColor: "#f39c12", cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onClick={handleUndoScore}
-              >
-                <CardContent sx={{ display: 'flex', flexDirection:'column', alignItems: 'center' }}>
-                  <UndoIcon sx={{ color: 'white', fontSize: { xs: '2rem', sm: '3rem' }, mr: 1 }} />
-                  <Typography variant="h5" align="center" color="white" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                    Undo
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-          {message && (
-            <div className="font-mono py-6 text-center text-lg">
-              {message}
+
+            <button className="wide-btn" onClick={handleWide}>
+              Wide
+            </button>
+            <button className="wicket-btn" onClick={handleWicket}>
+              Wicket
+            </button>
+            <button className="undo-btn" onClick={handleUndoScore}>
+              Undo
+            </button>
+          </div>
+
+          {message && <div className="message-box">{message}</div>}
+
+          <button className="reset-btn" onClick={handleOpenDialog}>
+            Reset Match
+          </button>
+
+          {openDialog && (
+            <div className="dialog">
+              <div className="dialog-content">
+                <p>Are you sure you want to reset the match?</p>
+                <div className="dialog-actions">
+                  <button className="cancel-btn" onClick={handleCloseDialog}>
+                    Cancel
+                  </button>
+                  <button
+                    className="confirm-btn"
+                    onClick={handleConfirmResetMatch}
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
             </div>
           )}
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleOpenDialog}
-            fullWidth
-            sx={{ mt: 4 }}
-          >
-            Reset Match
-          </Button>
-          
-          {/* Dialog Box for reset Confirmation */}
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle>Confirm Reset</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Are you sure you want to reset the match? This action cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleConfirmResetMatch} variant="outlined" color="secondary">
-                Confirm
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-        </Box>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 
