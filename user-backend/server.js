@@ -144,28 +144,27 @@ app.post("/reset-match/:cid", (req, res) => {
 // Endpoint to update the score
 app.post("/update-score/:cid", (req, res) => {
   try {
-    const { increment, isWicket, isWide } = req.body;
+    const { increment, isWicket, isWide, isDot } = req.body; // Add isDot to the request body
     const { cid } = req.params;
-  
     if (isMatchStarted) {
       // Save current score in history
       scoreHistory[cid].push({ ...scores[cid] });
-  
       if (isWicket) {
         scores[cid].wickets += 1; // Increment wickets
+        scores[cid].balls += 1; // Increment wickets
+      } else if (isDot) {
+        // Do nothing, just increment the balls
+        scores[cid].balls += 1;
       } else {
         scores[cid].runs += increment; // Update the score
+        // Increment ball count only if it's not a wide
+        if (!isWide) {
+          scores[cid].balls += 1;
+        }
       }
-  
-      // Increment ball count only if it's not a wide
-      if (!isWide) {
-        scores[cid].balls += 1;
-      }
-  
       sendScoreSSE({ isMatchStarted, scores, cid }); // Notify clients of score, wickets, and overs update
       return res.status(200).json({ message: "Score updated", scores: scores[cid] });
     }
-  
     res.status(400).json({ message: "Match not started" });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });

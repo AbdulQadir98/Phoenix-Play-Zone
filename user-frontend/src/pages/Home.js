@@ -54,6 +54,15 @@ const Home = () => {
     }
   };
 
+  const handleDotBall = async () => {
+    try {
+      await updateScore(cid, 0, false, false, true);
+      setMessage("Dot ball");
+    } catch (error) {
+      setMessage("Error updating dot ball");
+    }
+  };
+
   const handleUndoScore = async () => {
     try {
       await undoScore(cid);
@@ -110,7 +119,9 @@ const Home = () => {
                 {increment}
               </button>
             ))}
-
+            <button className="score-btn" onClick={handleDotBall}>
+              Dot
+            </button>
             <button className="wide-btn" onClick={handleWide}>
               Wide
             </button>
