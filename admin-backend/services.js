@@ -213,6 +213,35 @@ const getAllBookingsByStatus = async (status) => {
   }
 };
 
+const getBookingsByDate = async (status, date) => {
+  try {
+    // Convert the input date to a UTC start and end timestamp for the entire day
+    const startOfDay = new Date(date);
+    // startOfDay.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+    startOfDay.setHours(0, 0, 0, 0); // Set to midnight
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999); // Set to the end of the day
+
+    const snapshot = await db
+    // TODO: bookingtest
+      .collection("bookingDetails")
+      .where("status", "in", status)
+      .where("startTime", ">=", startOfDay.toISOString())
+      .where("startTime", "<=", endOfDay.toISOString())
+      .orderBy("startTime", "asc")
+      .get();
+
+    return snapshot.docs.map((doc) => ({
+      bookingId: doc.id,
+      ...doc.data(),
+    }));
+
+  } catch (error) {
+    console.error("Error fetching bookings by date:", error.message);
+    throw error;
+  }
+};
+
 const getBookingById = async (id) => {
   try {
     const bookingDoc = await db.collection("bookingDetails").doc(id).get();
@@ -230,6 +259,7 @@ const getBookingById = async (id) => {
 
 const addBookingDetails = async (bookingDetails) => {
   try {
+    // TODO: bookingtest
     const docRef = await db.collection("bookingDetails").add(bookingDetails);
     return {
       success: true,
@@ -370,6 +400,7 @@ module.exports = {
   getBookingsByStatusAndDate,
   getBookingsByStatusAndDateCount,
   getAllBookingsByStatus,
+  getBookingsByDate,
   getBookingById,
   addBookingDetails,
   deleteBookingById,

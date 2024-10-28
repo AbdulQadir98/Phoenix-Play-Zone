@@ -18,7 +18,7 @@ export const fetchCompletedPendingCancelledBookings = async (page, pageSize) => 
 export const fetchWebBookings = async () => {
   try {
     const response = await axios.get(PROD_API_URL + "/bookings", {
-      params: { status: "PAID" },
+      params: { status: "PAID,RESERVED" },
     });
     return response.data;
   } catch (error) {
@@ -30,7 +30,7 @@ export const fetchWebBookings = async () => {
 export const fetchRecentWebBookings = async (page, pageSize, date_from, date_to) => {
   try {
     const response = await axios.get(PROD_API_URL + "/range-booking", {
-      params: { status: "PAID", page, pageSize, date_from, date_to },
+      params: { status: "PAID,RESERVED", page, pageSize, date_from, date_to },
     });
     return response.data;
   } catch (error) {
@@ -58,6 +58,19 @@ export const sendBookingDetails = (bookingDetails) => {
   }, {
     timeout: 6000 // 6 seconds
   });
+};
+
+// Fetch booking details by date and status
+export const fetchBookingDetails = async (date) => {
+  try {
+    const response = await axios.get( PROD_API_URL + '/bookings-by-date', {
+      params: { status: "PENDING,PAID,RESERVED", date },
+    });
+    return response.data.bookings; // Assuming the bookings are returned under this key
+  } catch (error) {
+    console.error("Error fetching booking details:", error.message);
+    throw error;
+  }
 };
 
 export const updateBookingStatus = (id, status, endTime) => {

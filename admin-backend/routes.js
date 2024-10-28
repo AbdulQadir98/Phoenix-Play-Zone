@@ -11,6 +11,7 @@ const {
   getBookingsByStatusAndDate,
   getBookingsByStatusAndDateCount,
   getAllBookingsByStatus,
+  getBookingsByDate,
   getBookingById,
   addBookingDetails,
   deleteBookingById,
@@ -133,6 +134,29 @@ router.get("/booking/:id", async (req, res) => {
   }
 });
 
+// Get Bookings for a specific date
+router.get("/bookings-by-date", async (req, res) => {
+  
+  const { status, date  } = req.query;
+
+  try {
+    let bookings;
+
+    const statusArray = status ? status.split(",") : ["PENDING", "PAID", "RESERVED"];
+
+    if (date) {
+      bookings = await getBookingsByDate(statusArray, date);
+    } else {
+      return res.status(400).json({ error: "No date specified" });
+    }
+    return res.status(200).json({ bookings });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: err.message });
+  }
+});
+
 // Add Booking
 router.post("/booking", async (req, res) => {
   try {
@@ -185,7 +209,7 @@ router.patch("/booking/:id/status", async (req, res) => {
   const { status, endTime } = req.body;
 
   // Define allowed statuses
-  const allowedStatuses = ["PENDING", "CANCELLED", "COMPLETED", "DELETED", "PAID"];
+  const allowedStatuses = ["PENDING", "CANCELLED", "COMPLETED", "DELETED", "PAID", "RESERVED"];
 
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ error: "Invalid status value." });

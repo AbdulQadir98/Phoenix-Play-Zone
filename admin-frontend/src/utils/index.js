@@ -69,6 +69,8 @@ export const getAlertSeverity = (status) => {
       return "info";
     case "DELETED":
       return "error";
+    case "RESERVED":
+      return "warning";
     default:
       return "success";
   }

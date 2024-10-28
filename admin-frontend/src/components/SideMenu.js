@@ -21,12 +21,14 @@ import EventIcon from "@mui/icons-material/Event";
 import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 import Courts from "../pages/Courts";
 import Book from "../pages/Book";
 import History from "../pages/History";
 import Notification from "../pages/Notification";
 import Settings from "../pages/Settings";
+import Reservation from "../pages/Reservation";
 
 const drawerWidth = 240;
 
@@ -56,7 +58,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -142,7 +143,7 @@ export default function MiniDrawer() {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Courts", "Bookings"].map((text, index) => (
+          {["Courts", "Bookings", "Reservation"].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 onClick={() => setSelectedComponent(text.toLowerCase())}
@@ -161,6 +162,7 @@ export default function MiniDrawer() {
                 >
                   {text === "Courts" && <SportsTennisIcon />}
                   {text === "Bookings" && <EventIcon />}
+                  {text === "Reservation" && <BookmarkIcon />}
                 </ListItemIcon>
                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
@@ -202,9 +204,10 @@ export default function MiniDrawer() {
         <DrawerHeader />
         {selectedComponent === "courts" && <Courts />}
         {selectedComponent === "bookings" && <Book />}
+        {selectedComponent === "reservation" && <Reservation />}
         {selectedComponent === "history" && <History />}
         {selectedComponent === "notifications" && <Notification />}
-        {selectedComponent === "settings" && <Settings/>}
+        {selectedComponent === "settings" && <Settings />}
       </Box>
     </Box>
   );
