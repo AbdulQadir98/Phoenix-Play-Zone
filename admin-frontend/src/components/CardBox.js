@@ -419,7 +419,7 @@ const CardBox = ({ cid, title, name, image }) => {
           <Button onClick={handleClose}>Cancel</Button>
           <Button
             onClick={handleStartTimer}
-            disabled={loading || hours * 60 + minutes < 60}
+            disabled={loading || hours * 60 + minutes < 30}
           >
             {loading ? "Submitting..." : "Start"}
           </Button>

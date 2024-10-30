@@ -194,11 +194,13 @@ const BasicTable = () => {
                     {formatDate(row.startTime)}
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton
-                      onClick={() => handleOpenDialog(row.bookingId)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    {row.status !== "COMPLETED" && (
+                      <IconButton
+                        onClick={() => handleOpenDialog(row.bookingId)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
