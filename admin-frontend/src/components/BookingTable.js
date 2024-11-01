@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchRecentWebBookings } from "../services/booking";
+import { deleteBookingDetails, fetchRecentWebBookings } from "../services/booking";
 import {
   formatDateToYYYYMMDD,
   formatDateToDDMMYYYY,
@@ -21,7 +21,9 @@ import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import Alert from "@mui/material/Alert";
-import { CircularProgress, Snackbar } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import { CircularProgress, Snackbar, Typography } from "@mui/material";
 
 const BookingTable = () => {
   const [bookings, setBookings] = useState([]);
@@ -32,27 +34,27 @@ const BookingTable = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar visibility
   const [loading, setLoading] = useState(false); // State for loading
+  const [isError, setIsError] = useState(false); // State for error indication
 
   const getRecentBookings = async (page, pageSize) => {
     setLoading(true);
+    setIsError(false);
     try {
-      // Get today's date and 3 days later
       const today = new Date();
-      const tommorrow = new Date(today);
-      tommorrow.setDate(today.getDate() + 2);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 2);
 
       const date_from = formatDateToYYYYMMDD(today);
-      const date_to = formatDateToYYYYMMDD(tommorrow);
-      // const date_from = '2024-10-01';
-      // const date_to = '2024-10-31'
-      
+      const date_to = formatDateToYYYYMMDD(tomorrow);
+
       const data = await fetchRecentWebBookings(page, pageSize, date_from, date_to);
       setBookings(data.bookings);
       setTotalBookings(data.totalCount);
     } catch (error) {
       console.error("Error fetching web bookings:", error.message);
-      setErrorMessage(`Failed to fetch Recent bookings: ${error.message}`);
-      setOpenSnackbar(true); // Show Snackbar with error message
+      setErrorMessage(`Failed to fetch recent bookings: ${error.message}`);
+      setIsError(true); // Set error if the fetch fails
+      setOpenSnackbar(true);
     } finally {
       setLoading(false); // Set loading to false after fetch
     }
@@ -83,6 +85,16 @@ const BookingTable = () => {
 
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
+  };
+
+  const handleDeleteReservation = async (bookingId) => {
+    try {
+      await deleteBookingDetails(bookingId);
+      getRecentBookings(page + 1, rowsPerPage);
+    } catch (error) {
+      setErrorMessage(`Failed to delete reservation: ${error.message}`);
+      setOpenSnackbar(true);
+    }
   };
 
   return (
@@ -120,14 +132,22 @@ const BookingTable = () => {
               <TableCell align="right">Contact</TableCell>
               <TableCell align="right">Amount&nbsp;(Rs.)</TableCell>
               <TableCell align="right">Status</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                {/* 8 should be dynamic */}
-                <TableCell colSpan={8} align="center">
+                <TableCell colSpan={9} align="center">
                   <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={9} align="center">
+                  <Typography color="error">
+                    {errorMessage || "No bookings available."}
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
@@ -155,6 +175,13 @@ const BookingTable = () => {
                     <Alert severity={getAlertSeverity(row.status)}>
                       {row.status}
                     </Alert>
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      onClick={() => handleDeleteReservation(row.bookingId)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))

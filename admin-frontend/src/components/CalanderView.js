@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchWebBookings } from "../services/booking";
+import { fetchWebBookings, deleteBookingDetails } from "../services/booking";
 import { formatTimeTo12Hour, convertMinutesToHours } from "../utils/index";
 import {
   Button,
@@ -8,6 +8,8 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
@@ -38,6 +40,16 @@ const CalanderView = () => {
   useEffect(() => {
     getBookings();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteBookingDetails(id);
+      setBookings(bookings.filter((booking) => booking.bookingId !== id));
+    } catch (error) {
+      setErrorMessage(`Failed to delete reservation: ${error.message}`);
+      setOpenSnackbar(true);
+    }
+  };
 
   const handleToggle = () => {
     setShowMore((prevState) => !prevState);
@@ -88,20 +100,28 @@ const CalanderView = () => {
 
               <div className="py-2 mt-4 space-y-4">
                 {filteredBookings.length > 0 ? (
-                  filteredBookings.map((booking, index) => (
+                  filteredBookings.map((booking) => (
                     <div
-                      key={index}
-                      className="py-2 px-3 border border-gray-100 rounded-lg bg-gray-700"
+                      key={booking.bookingId}
+                      className="flex justify-between items-center py-2 px-3 border border-gray-100 rounded-lg bg-gray-700"
                     >
-                      <div className="text-gray-100">
-                        {booking.title}
+                      <div>
+                        <div className="text-gray-100">
+                          {booking.title}
+                        </div>
+                        <div className="text-gray-300">
+                          Time: {formatTimeTo12Hour(booking.startTime)}
+                        </div>
+                        <div className="text-gray-300">
+                          Duration: {convertMinutesToHours(booking.duration)}
+                        </div>
                       </div>
-                      <div className="text-gray-300">
-                        Time: {formatTimeTo12Hour(booking.startTime)}
-                      </div>
-                      <div className="text-gray-300">
-                        Duration: {convertMinutesToHours(booking.duration)}
-                      </div>
+                      <IconButton
+                        color="secondary"
+                        onClick={() => handleDelete(booking.bookingId)}
+                      >
+                        <DeleteIcon />
+                      </IconButton> 
                     </div>
                   ))
                 ) : (

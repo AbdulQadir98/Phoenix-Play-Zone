@@ -9,6 +9,7 @@ const BookingConfirmation = ({ bookingDetails }) => {
   const [contactNumber, setContactNumber] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleConfirm = () => {
     const cid = bookingDetails.court.id;
@@ -47,6 +48,11 @@ const BookingConfirmation = ({ bookingDetails }) => {
     endTime.setMinutes(endTimeParts.minutes);
     endTime.setSeconds(0);
 
+    // If endTime is before startTime, the end time is on the next day (last slot)
+    if (endTime < startTime) {
+      endTime.setDate(endTime.getDate() + 1);
+    }
+
     // Calculate the duration in seconds
     const duration = (endTime - startTime) / 1000; // difference in seconds
 
@@ -66,11 +72,13 @@ const BookingConfirmation = ({ bookingDetails }) => {
 
     sendBookingDetails(transformedBookingDetails)
       .then((response) => {
-        setDialogMessage("Booking was placed successfully");
+        setDialogMessage("Reservation was placed successfully");
+        setIsError(false);
         setOpenDialog(true);
       })
       .catch((error) => {
-        setDialogMessage("Failed to place booking. Please try again.");
+        setDialogMessage("Failed to Reserve Court. Please try again.");
+        setIsError(true);
         setOpenDialog(true);
       })
   };
@@ -140,9 +148,9 @@ const BookingConfirmation = ({ bookingDetails }) => {
 
       {/* Dialog for displaying messages */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Booking Status</DialogTitle>
+        <DialogTitle>Reservation Status</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText style={{ color: isError ? 'red' : 'inherit' }}>
             {dialogMessage}
           </DialogContentText>
         </DialogContent>

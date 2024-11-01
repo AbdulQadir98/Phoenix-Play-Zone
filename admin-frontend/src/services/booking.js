@@ -81,3 +81,13 @@ export const updateBookingStatus = (id, status, endTime) => {
     timeout: 6000 // 6 seconds timeout
   });
 };
+
+export const deleteBookingDetails = async (id) => {
+  try {
+    const response = await axios.delete(PROD_API_URL + `/booking/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error Deleting Reserved bookings");
+    throw error;
+  }
+};
